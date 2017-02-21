@@ -1,0 +1,21 @@
+{
+  "name": "vineyard-lawn",
+  "version": "0.1.0",
+  "description": "Vineyard Lawn",
+  "main": "source/lawn.js",
+  "types": "source/lawn.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "git@github.com:silentorb/vineyard-lawn.git",
+  "author": "Christopher W. Johnson",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.0.35",
+    "@types/node": "^7.0.5",
+    "typescript": "^2.1.6"
+  }
+}
