@@ -1,9 +1,9 @@
 {
   "name": "vineyard-lawn",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Vineyard Lawn",
-  "main": "source/lawn.js",
-  "types": "source/lawn.d.ts",
+  "main": "source/index.js",
+  "types": "source/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.16.1",
+    "cors": "^2.8.1",
     "express": "^4.14.1"
   },
   "devDependencies": {

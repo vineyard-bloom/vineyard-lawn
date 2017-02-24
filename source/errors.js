@@ -43,4 +43,3 @@ var Unauthorized = (function (_super) {
     return Unauthorized;
 }(HTTP_Error));
 exports.Unauthorized = Unauthorized;
-//# sourceMappingURL=errors.js.map

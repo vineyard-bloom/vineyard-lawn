@@ -70,14 +70,4 @@ function initialize_endpoints(app, endpoints) {
     }
 }
 exports.initialize_endpoints = initialize_endpoints;
-function start(app, port) {
-    return new Promise(function (resolve, reject) {
-        app.listen(port, function (err) {
-            if (err)
-                reject("Error starting server");
-            console.log('API is listening on port ' + port);
-            resolve();
-        });
-    });
-}
-exports.start = start;
+//# sourceMappingURL=api.js.map
