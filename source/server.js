@@ -3,6 +3,7 @@ var express = require("express");
 var api_1 = require("./api");
 var Server = (function () {
     function Server() {
+        this.port = 3000;
         this.app = express();
     }
     Server.prototype.add_endpoints = function (endpoints) {
@@ -17,22 +18,31 @@ var Server = (function () {
             credentials: true
         }));
     };
-    Server.prototype.start = function (port) {
-        start_express(this.app, port);
+    Server.prototype.start = function (config) {
+        var _this = this;
+        this.port = (config && config.port) || 3000;
+        return start_express(this.app, this.port)
+            .then(function (server) { return _this.node_server = server; });
     };
     Server.prototype.get_app = function () {
         return this.app;
+    };
+    Server.prototype.get_port = function () {
+        return this.port;
+    };
+    Server.prototype.stop = function () {
+        this.node_server.close();
     };
     return Server;
 }());
 exports.Server = Server;
 function start_express(app, port) {
     return new Promise(function (resolve, reject) {
-        app.listen(port, function (err) {
+        var server = app.listen(port, function (err) {
             if (err)
                 reject("Error starting server");
             console.log('API is listening on port ' + port);
-            resolve();
+            resolve(server);
         });
     });
 }

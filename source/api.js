@@ -50,14 +50,16 @@ function create_handler(endpoint) {
     };
 }
 exports.create_handler = create_handler;
-function attach_handler(app, method, route, handler) {
-    if (route[0] != '/')
-        route = '/' + route;
-    if (method == Method.get) {
-        app.get(route, handler);
+function attach_handler(app, endpoint, handler) {
+    var path = endpoint.path;
+    if (path[0] != '/')
+        path = '/' + path;
+    var middleware = endpoint.middleware || [];
+    if (endpoint.method == Method.get) {
+        app.get(path, middleware, handler);
     }
     else {
-        app.post(route, json_parser, handler);
+        app.post(path, [json_parser].concat(middleware), handler);
     }
 }
 exports.attach_handler = attach_handler;
@@ -66,7 +68,7 @@ function initialize_endpoints(app, endpoints) {
     for (var _i = 0, endpoints_1 = endpoints; _i < endpoints_1.length; _i++) {
         var endpoint = endpoints_1[_i];
         var handler = create_handler(endpoint);
-        attach_handler(app, endpoint.method, endpoint.path, handler);
+        attach_handler(app, endpoint, handler);
     }
 }
 exports.initialize_endpoints = initialize_endpoints;

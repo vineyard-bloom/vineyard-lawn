@@ -11,7 +11,7 @@ export class HTTP_Error extends Error {
 
 export class Bad_Request extends HTTP_Error {
 
-  constructor(message: string = "Bad request") {
+  constructor(message: string = "Bad Request") {
     super(message, 400)
   }
 }

@@ -19,7 +19,7 @@ exports.HTTP_Error = HTTP_Error;
 var Bad_Request = (function (_super) {
     __extends(Bad_Request, _super);
     function Bad_Request(message) {
-        if (message === void 0) { message = "Bad request"; }
+        if (message === void 0) { message = "Bad Request"; }
         _super.call(this, message, 400);
     }
     return Bad_Request;
@@ -43,3 +43,4 @@ var Unauthorized = (function (_super) {
     return Unauthorized;
 }(HTTP_Error));
 exports.Unauthorized = Unauthorized;
+//# sourceMappingURL=errors.js.map

@@ -8,7 +8,7 @@ export * from './errors'
 
 // const json_parser = body_parser.json()
 const json_temp = body_parser.json()
-const json_parser = function (req, res, next) {
+const json_parser = function(req, res, next) {
   json_temp(req, res, next)
 }
 export enum Method {
@@ -25,6 +25,7 @@ export interface Endpoint_Info {
   method: Method
   path: string
   action: Response_Generator
+  middleware?: any[]
 }
 
 export function handle_error(res, error) {
@@ -62,22 +63,25 @@ export function create_handler(endpoint: Endpoint_Info) {
   }
 }
 
-export function attach_handler(app: express.Application, method: Method, route: string, handler) {
-  if (route [0] != '/')
-    route = '/' + route
+export function attach_handler(app: express.Application, endpoint: Endpoint_Info, handler) {
+  let path = endpoint.path
+  if (path [0] != '/')
+    path = '/' + path
 
-  if (method == Method.get) {
-    app.get(route, handler)
+  const middleware = endpoint.middleware || []
+  if (endpoint.method == Method.get) {
+    app.get(path, middleware, handler)
   }
   else {
-    app.post(route, json_parser, handler)
+    app.post(path, [json_parser].concat(middleware), handler)
   }
+
 }
 
 // initialize_endpoints() is the primary entry point
 export function initialize_endpoints(app: express.Application, endpoints: Endpoint_Info[]) {
   for (let endpoint of endpoints) {
     const handler = create_handler(endpoint)
-    attach_handler(app, endpoint.method, endpoint.path, handler)
+    attach_handler(app, endpoint, handler)
   }
 }
