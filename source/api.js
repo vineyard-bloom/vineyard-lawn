@@ -37,7 +37,10 @@ function get_arguments(req) {
 function create_handler(endpoint) {
     return function (req, res) {
         try {
-            endpoint.action(get_arguments(req))
+            var request = {
+                data: get_arguments(req)
+            };
+            endpoint.action(request)
                 .then(function (content) {
                 res.send(content);
             }, function (error) {
@@ -63,13 +66,20 @@ function attach_handler(app, endpoint, handler) {
     }
 }
 exports.attach_handler = attach_handler;
-// initialize_endpoints() is the primary entry point
-function initialize_endpoints(app, endpoints) {
+function create_endpoint(app, endpoint) {
+    var handler = create_handler(endpoint);
+    attach_handler(app, endpoint, handler);
+}
+exports.create_endpoint = create_endpoint;
+function create_endpoint_with_defaults(app, endpoint_defaults, endpoint) {
+    create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint));
+}
+exports.create_endpoint_with_defaults = create_endpoint_with_defaults;
+function create_endpoints(app, endpoints) {
     for (var _i = 0, endpoints_1 = endpoints; _i < endpoints_1.length; _i++) {
         var endpoint = endpoints_1[_i];
-        var handler = create_handler(endpoint);
-        attach_handler(app, endpoint, handler);
+        create_endpoint(app, endpoint);
     }
 }
-exports.initialize_endpoints = initialize_endpoints;
+exports.create_endpoints = create_endpoints;
 //# sourceMappingURL=api.js.map

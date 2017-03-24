@@ -1,0 +1,3 @@
+interface Request {
+  data: any
+}

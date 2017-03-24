@@ -16,16 +16,24 @@ export enum Method {
   post
 }
 
-// Having a hard time getting TypeScript to see 'Promise' in this project though it's working in identically configured
-// projects.  For now just using 'any'.
-// export type Response_Generator = (request: express.Request) => Promise<any>
-export type Response_Generator = (args: any) => any
+export type Promise_Or_Void = Promise<void> | void
+export type Response_Generator = (request: Request) => Promise<any>
+export type Filter = (request: Request) => Promise_Or_Void
 
 export interface Endpoint_Info {
   method: Method
   path: string
   action: Response_Generator
   middleware?: any[]
+  filter?: Filter
+}
+
+export interface Optional_Endpoint_Info {
+  method?: Method
+  path?: string
+  action?: Response_Generator
+  middleware?: any[]
+  filter?: Filter
 }
 
 export function handle_error(res, error) {
@@ -49,7 +57,10 @@ function get_arguments(req: express.Request) {
 export function create_handler(endpoint: Endpoint_Info) {
   return function(req, res) {
     try {
-      endpoint.action(get_arguments(req))
+      const request = {
+        data: get_arguments(req)
+      }
+      endpoint.action(request)
         .then(function(content) {
             res.send(content)
           },
@@ -78,10 +89,18 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 
 }
 
-// initialize_endpoints() is the primary entry point
-export function initialize_endpoints(app: express.Application, endpoints: Endpoint_Info[]) {
+export function create_endpoint(app: express.Application, endpoint: Endpoint_Info) {
+  const handler = create_handler(endpoint)
+  attach_handler(app, endpoint, handler)
+}
+
+export function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info,
+                                              endpoint: Optional_Endpoint_Info) {
+  create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint))
+}
+
+export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[]) {
   for (let endpoint of endpoints) {
-    const handler = create_handler(endpoint)
-    attach_handler(app, endpoint, handler)
+    create_endpoint(app, endpoint)
   }
 }
