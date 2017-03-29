@@ -1,4 +1,5 @@
 /// <reference types="es6-promise" />
+/// <reference types="express" />
 import * as express from "express";
 export interface Server_Config {
     port?: number;

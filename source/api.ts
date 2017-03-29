@@ -58,7 +58,8 @@ export function create_handler(endpoint: Endpoint_Info) {
   return function(req, res) {
     try {
       const request = {
-        data: get_arguments(req)
+        data: get_arguments(req),
+        session: req.session
       }
       endpoint.action(request)
         .then(function(content) {
