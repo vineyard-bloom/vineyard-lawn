@@ -1,5 +1,4 @@
 # Vineyard Lawn
-Vineyard Lawn is
 
 Vineyard Lawn is a wrapper for Express.js that provides a high level API for defining JSON web services.
 
