@@ -1,5 +1,4 @@
 // Vineyard Lawn
-// version 0.1.0
 // created by Christopher W. Johnson
 "use strict";
 function __export(m) {
