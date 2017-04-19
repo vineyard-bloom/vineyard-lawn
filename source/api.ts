@@ -7,7 +7,7 @@ export * from './errors'
 
 // const json_parser = body_parser.json()
 const json_temp = body_parser.json()
-const json_parser = function(req, res, next) {
+const json_parser = function (req, res, next) {
   json_temp(req, res, next)
 }
 export enum Method {
@@ -53,18 +53,18 @@ function get_arguments(req: express.Request) {
   return result
 }
 
-export function create_handler(endpoint: Endpoint_Info) {
-  return function(req, res) {
+export function create_handler(endpoint: Endpoint_Info, action) {
+  return function (req, res) {
     try {
       const request = {
         data: get_arguments(req),
         session: req.session
       }
-      endpoint.action(request)
-        .then(function(content) {
+      action(request)
+        .then(function (content) {
             res.send(content)
           },
-          function(error) {
+          function (error) {
             handle_error(res, error)
           })
     }
@@ -89,18 +89,25 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 
 }
 
-export function create_endpoint(app: express.Application, endpoint: Endpoint_Info) {
-  const handler = create_handler(endpoint)
+export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
+                                preprocessor: Response_Generator = null) {
+  const action = preprocessor
+    ? request => preprocessor(request).then(request => endpoint.action(request))
+    : endpoint.action
+
+  const handler = create_handler(endpoint, action)
   attach_handler(app, endpoint, handler)
 }
 
 export function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info,
-                                              endpoint: Optional_Endpoint_Info) {
-  create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint))
+                                              endpoint: Optional_Endpoint_Info,
+                                              preprocessor: Response_Generator = null) {
+  create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint), preprocessor)
 }
 
-export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[]) {
+export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[],
+                                 preprocessor: Response_Generator = null) {
   for (let endpoint of endpoints) {
-    create_endpoint(app, endpoint)
+    create_endpoint(app, endpoint, preprocessor)
   }
 }

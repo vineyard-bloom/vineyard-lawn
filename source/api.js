@@ -33,14 +33,14 @@ function get_arguments(req) {
     }
     return result;
 }
-function create_handler(endpoint) {
+function create_handler(endpoint, action) {
     return function (req, res) {
         try {
             var request = {
                 data: get_arguments(req),
                 session: req.session
             };
-            endpoint.action(request)
+            action(request)
                 .then(function (content) {
                 res.send(content);
             }, function (error) {
@@ -66,19 +66,25 @@ function attach_handler(app, endpoint, handler) {
     }
 }
 exports.attach_handler = attach_handler;
-function create_endpoint(app, endpoint) {
-    var handler = create_handler(endpoint);
+function create_endpoint(app, endpoint, preprocessor) {
+    if (preprocessor === void 0) { preprocessor = null; }
+    var action = preprocessor
+        ? function (request) { return preprocessor(request).then(function (request) { return endpoint.action(request); }); }
+        : endpoint.action;
+    var handler = create_handler(endpoint, action);
     attach_handler(app, endpoint, handler);
 }
 exports.create_endpoint = create_endpoint;
-function create_endpoint_with_defaults(app, endpoint_defaults, endpoint) {
-    create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint));
+function create_endpoint_with_defaults(app, endpoint_defaults, endpoint, preprocessor) {
+    if (preprocessor === void 0) { preprocessor = null; }
+    create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint), preprocessor);
 }
 exports.create_endpoint_with_defaults = create_endpoint_with_defaults;
-function create_endpoints(app, endpoints) {
+function create_endpoints(app, endpoints, preprocessor) {
+    if (preprocessor === void 0) { preprocessor = null; }
     for (var _i = 0, endpoints_1 = endpoints; _i < endpoints_1.length; _i++) {
         var endpoint = endpoints_1[_i];
-        create_endpoint(app, endpoint);
+        create_endpoint(app, endpoint, preprocessor);
     }
 }
 exports.create_endpoints = create_endpoints;

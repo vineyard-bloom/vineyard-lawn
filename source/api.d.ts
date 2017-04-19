@@ -24,8 +24,8 @@ export interface Optional_Endpoint_Info {
     filter?: Filter;
 }
 export declare function handle_error(res: any, error: any): void;
-export declare function create_handler(endpoint: Endpoint_Info): (req: any, res: any) => void;
+export declare function create_handler(endpoint: Endpoint_Info, action: any): (req: any, res: any) => void;
 export declare function attach_handler(app: express.Application, endpoint: Endpoint_Info, handler: any): void;
-export declare function create_endpoint(app: express.Application, endpoint: Endpoint_Info): void;
-export declare function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info, endpoint: Optional_Endpoint_Info): void;
-export declare function create_endpoints(app: express.Application, endpoints: Endpoint_Info[]): void;
+export declare function create_endpoint(app: express.Application, endpoint: Endpoint_Info, preprocessor?: Response_Generator): void;
+export declare function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info, endpoint: Optional_Endpoint_Info, preprocessor?: Response_Generator): void;
+export declare function create_endpoints(app: express.Application, endpoints: Endpoint_Info[], preprocessor?: Response_Generator): void;
