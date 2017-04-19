@@ -1,5 +1,5 @@
 import * as express from "express"
-import {initialize_endpoints} from "./api"
+import {create_endpoints, Request_Processor} from "./api"
 
 export interface Server_Config {
   port?: number
@@ -9,13 +9,15 @@ export class Server {
   private app
   private node_server
   private port: number = 3000
+  private default_preprocessor = null
 
-  constructor() {
+  constructor(default_preprocessor?:Request_Processor) {
     this.app = express()
+    this.default_preprocessor = default_preprocessor
   }
 
-  add_endpoints(endpoints) {
-    initialize_endpoints(this.app, endpoints)
+  add_endpoints(endpoints, preprocessor?: Request_Processor) {
+    create_endpoints(this.app, endpoints, preprocessor || this.default_preprocessor)
   }
 
   enable_cors() {

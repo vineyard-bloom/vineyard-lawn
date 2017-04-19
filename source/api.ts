@@ -15,7 +15,12 @@ export enum Method {
   post
 }
 
+export interface Request {
+  data: any
+}
+
 export type Promise_Or_Void = Promise<void> | void
+export type Request_Processor = (request: Request) => Promise<Request>
 export type Response_Generator = (request: Request) => Promise<any>
 export type Filter = (request: Request) => Promise_Or_Void
 
@@ -90,7 +95,7 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 }
 
 export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
-                                preprocessor: Response_Generator = null) {
+                                preprocessor: Request_Processor = null) {
   const action = preprocessor
     ? request => preprocessor(request).then(request => endpoint.action(request))
     : endpoint.action
@@ -101,12 +106,12 @@ export function create_endpoint(app: express.Application, endpoint: Endpoint_Inf
 
 export function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info,
                                               endpoint: Optional_Endpoint_Info,
-                                              preprocessor: Response_Generator = null) {
+                                              preprocessor: Request_Processor = null) {
   create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint), preprocessor)
 }
 
 export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                 preprocessor: Response_Generator = null) {
+                                 preprocessor: Request_Processor = null) {
   for (let endpoint of endpoints) {
     create_endpoint(app, endpoint, preprocessor)
   }

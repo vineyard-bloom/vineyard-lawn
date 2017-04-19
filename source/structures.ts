@@ -1,3 +1,0 @@
-interface Request {
-  data: any
-}
