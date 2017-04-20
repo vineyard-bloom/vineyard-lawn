@@ -5,6 +5,8 @@ export * from './errors';
 export declare enum Method {
     get = 0,
     post = 1,
+    put = 2,
+    delete = 3,
 }
 export interface Request {
     data: any;

@@ -12,7 +12,9 @@ const json_parser = function (req, res, next) {
 }
 export enum Method {
   get,
-  post
+  post,
+  put,
+  delete
 }
 
 export interface Request {
@@ -85,13 +87,24 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
     path = '/' + path
 
   const middleware = endpoint.middleware || []
-  if (endpoint.method == Method.get) {
-    app.get(path, middleware, handler)
-  }
-  else {
-    app.post(path, [json_parser].concat(middleware), handler)
-  }
+  switch (endpoint.method) {
+    case Method.get:
+      app.get(path, middleware, handler)
+      break;
 
+    case Method.post:
+      app.post(path, [json_parser].concat(middleware), handler)
+      break;
+
+    case Method.put:
+      app.put(path, [json_parser].concat(middleware), handler)
+      break;
+
+    case Method.delete:
+      app.delete(path, [json_parser].concat(middleware), handler)
+      break;
+
+  }
 }
 
 export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
@@ -116,3 +129,4 @@ export function create_endpoints(app: express.Application, endpoints: Endpoint_I
     create_endpoint(app, endpoint, preprocessor)
   }
 }
+

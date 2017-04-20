@@ -4,18 +4,21 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var body_parser = require('body-parser');
-__export(require('./errors'));
+Object.defineProperty(exports, "__esModule", { value: true });
+var body_parser = require("body-parser");
+__export(require("./errors"));
 // const json_parser = body_parser.json()
 var json_temp = body_parser.json();
 var json_parser = function (req, res, next) {
     json_temp(req, res, next);
 };
+var Method;
 (function (Method) {
     Method[Method["get"] = 0] = "get";
     Method[Method["post"] = 1] = "post";
-})(exports.Method || (exports.Method = {}));
-var Method = exports.Method;
+    Method[Method["put"] = 2] = "put";
+    Method[Method["delete"] = 3] = "delete";
+})(Method = exports.Method || (exports.Method = {}));
 function handle_error(res, error) {
     var status = error.status || 500;
     console.error("Error", status, error.message);
@@ -36,11 +39,11 @@ function get_arguments(req) {
 function create_handler(endpoint, action) {
     return function (req, res) {
         try {
-            var request = {
+            var request_1 = {
                 data: get_arguments(req),
                 session: req.session
             };
-            action(request)
+            action(request_1)
                 .then(function (content) {
                 res.send(content);
             }, function (error) {
@@ -58,11 +61,19 @@ function attach_handler(app, endpoint, handler) {
     if (path[0] != '/')
         path = '/' + path;
     var middleware = endpoint.middleware || [];
-    if (endpoint.method == Method.get) {
-        app.get(path, middleware, handler);
-    }
-    else {
-        app.post(path, [json_parser].concat(middleware), handler);
+    switch (endpoint.method) {
+        case Method.get:
+            app.get(path, middleware, handler);
+            break;
+        case Method.post:
+            app.post(path, [json_parser].concat(middleware), handler);
+            break;
+        case Method.put:
+            app.put(path, [json_parser].concat(middleware), handler);
+            break;
+        case Method.delete:
+            app.delete(path, [json_parser].concat(middleware), handler);
+            break;
     }
 }
 exports.attach_handler = attach_handler;
