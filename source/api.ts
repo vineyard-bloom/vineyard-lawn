@@ -19,6 +19,7 @@ export enum Method {
 
 export interface Request {
   data: any
+  session: any
 }
 
 export type Promise_Or_Void = Promise<void> | void
@@ -46,6 +47,7 @@ export function handle_error(res, error) {
   const status = error.status || 500
   console.error("Error", status, error.message)
   const message = status == 500 ? "Server Error" : error.message
+  res.statusMessage = message
   res.status(status).send({
     message: message
   })
@@ -54,8 +56,8 @@ export function handle_error(res, error) {
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function get_arguments(req: express.Request) {
   const result = req.body || {}
-  for (let i in  req.query) {
-    result[i] = req[i]
+  for (let i in req.query) {
+    result[i] = req.query[i]
   }
   return result
 }

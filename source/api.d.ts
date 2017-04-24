@@ -1,5 +1,4 @@
 /// <reference types="es6-promise" />
-/// <reference types="express" />
 import * as express from "express";
 export * from './errors';
 export declare enum Method {
@@ -10,6 +9,7 @@ export declare enum Method {
 }
 export interface Request {
     data: any;
+    session: any;
 }
 export declare type Promise_Or_Void = Promise<void> | void;
 export declare type Request_Processor = (request: Request) => Promise<Request>;

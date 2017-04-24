@@ -23,6 +23,7 @@ function handle_error(res, error) {
     var status = error.status || 500;
     console.error("Error", status, error.message);
     var message = status == 500 ? "Server Error" : error.message;
+    res.statusMessage = message;
     res.status(status).send({
         message: message
     });
@@ -32,7 +33,7 @@ exports.handle_error = handle_error;
 function get_arguments(req) {
     var result = req.body || {};
     for (var i in req.query) {
-        result[i] = req[i];
+        result[i] = req.query[i];
     }
     return result;
 }
