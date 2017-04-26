@@ -4,21 +4,20 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
-var body_parser = require("body-parser");
-__export(require("./errors"));
+var body_parser = require('body-parser');
+__export(require('./errors'));
 // const json_parser = body_parser.json()
 var json_temp = body_parser.json();
 var json_parser = function (req, res, next) {
     json_temp(req, res, next);
 };
-var Method;
 (function (Method) {
     Method[Method["get"] = 0] = "get";
     Method[Method["post"] = 1] = "post";
     Method[Method["put"] = 2] = "put";
     Method[Method["delete"] = 3] = "delete";
-})(Method = exports.Method || (exports.Method = {}));
+})(exports.Method || (exports.Method = {}));
+var Method = exports.Method;
 function handle_error(res, error) {
     var status = error.status || 500;
     console.error("Error", status, error.message);
@@ -40,11 +39,11 @@ function get_arguments(req) {
 function create_handler(endpoint, action) {
     return function (req, res) {
         try {
-            var request_1 = {
+            var request = {
                 data: get_arguments(req),
                 session: req.session
             };
-            action(request_1)
+            action(request)
                 .then(function (content) {
                 res.send(content);
             }, function (error) {
@@ -100,4 +99,3 @@ function create_endpoints(app, endpoints, preprocessor) {
     }
 }
 exports.create_endpoints = create_endpoints;
-//# sourceMappingURL=api.js.map

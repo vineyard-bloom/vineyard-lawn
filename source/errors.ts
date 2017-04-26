@@ -6,6 +6,7 @@ export class HTTP_Error extends Error {
   constructor(message: string = "Server Error", status: number = 500) {
     super(message)
     this.status = status
+    this.message = message // super(message) doesn't seem to be working.
   }
 }
 
