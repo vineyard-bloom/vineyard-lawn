@@ -23,7 +23,6 @@ export class Server {
   enable_cors() {
     this.app.use(require('cors')({
       origin: function(origin, callback) {
-        console.log('cors', origin)
         callback(null, true)
       },
       credentials: true
@@ -33,7 +32,10 @@ export class Server {
   start(config: Server_Config): Promise<void> {
     this.port = (config && config.port) || 3000
     return start_express(this.app, this.port)
-      .then(server => this.node_server = server)
+      .then(server => {
+        this.node_server = server
+        console.log('Listening on port ' + this.port + '.')
+      })
   }
 
   get_app() {

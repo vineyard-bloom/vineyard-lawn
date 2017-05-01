@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var api_1 = require("./api");
 var Server = (function () {
@@ -14,7 +15,6 @@ var Server = (function () {
     Server.prototype.enable_cors = function () {
         this.app.use(require('cors')({
             origin: function (origin, callback) {
-                console.log('cors', origin);
                 callback(null, true);
             },
             credentials: true
@@ -24,7 +24,10 @@ var Server = (function () {
         var _this = this;
         this.port = (config && config.port) || 3000;
         return start_express(this.app, this.port)
-            .then(function (server) { return _this.node_server = server; });
+            .then(function (server) {
+            _this.node_server = server;
+            console.log('Listening on port ' + _this.port + '.');
+        });
     };
     Server.prototype.get_app = function () {
         return this.app;
@@ -49,3 +52,4 @@ function start_express(app, port) {
     });
 }
 exports.start_express = start_express;
+//# sourceMappingURL=server.js.map

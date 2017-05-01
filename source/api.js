@@ -4,20 +4,21 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var body_parser = require('body-parser');
-__export(require('./errors'));
+Object.defineProperty(exports, "__esModule", { value: true });
+var body_parser = require("body-parser");
+__export(require("./errors"));
 // const json_parser = body_parser.json()
 var json_temp = body_parser.json();
 var json_parser = function (req, res, next) {
     json_temp(req, res, next);
 };
+var Method;
 (function (Method) {
     Method[Method["get"] = 0] = "get";
     Method[Method["post"] = 1] = "post";
     Method[Method["put"] = 2] = "put";
     Method[Method["delete"] = 3] = "delete";
-})(exports.Method || (exports.Method = {}));
-var Method = exports.Method;
+})(Method = exports.Method || (exports.Method = {}));
 function handle_error(res, error) {
     var status = error.status || 500;
     console.error("Error", status, error.message);
@@ -99,3 +100,4 @@ function create_endpoints(app, endpoints, preprocessor) {
     }
 }
 exports.create_endpoints = create_endpoints;
+//# sourceMappingURL=api.js.map

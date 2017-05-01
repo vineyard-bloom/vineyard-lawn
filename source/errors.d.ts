@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export declare class HTTP_Error extends Error {
     status: number;
     constructor(message?: string, status?: number);

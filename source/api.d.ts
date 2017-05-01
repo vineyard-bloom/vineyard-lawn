@@ -1,5 +1,3 @@
-/// <reference types="es6-promise" />
-/// <reference types="express" />
 import * as express from "express";
 export * from './errors';
 export declare enum Method {
