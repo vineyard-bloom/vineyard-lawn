@@ -13,12 +13,14 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var HTTP_Error = (function (_super) {
     __extends(HTTP_Error, _super);
-    function HTTP_Error(message, status) {
+    function HTTP_Error(message, status, body) {
         if (message === void 0) { message = "Server Error"; }
         if (status === void 0) { status = 500; }
+        if (body === void 0) { body = {}; }
         var _this = _super.call(this, message) || this;
         _this.status = status;
         _this.message = message; // super(message) doesn't seem to be working.
+        _this.body = body;
         return _this;
     }
     return HTTP_Error;
@@ -26,9 +28,10 @@ var HTTP_Error = (function (_super) {
 exports.HTTP_Error = HTTP_Error;
 var Bad_Request = (function (_super) {
     __extends(Bad_Request, _super);
-    function Bad_Request(message) {
+    function Bad_Request(message, body) {
         if (message === void 0) { message = "Bad Request"; }
-        return _super.call(this, message, 400) || this;
+        if (body === void 0) { body = {}; }
+        return _super.call(this, message, 400, body) || this;
     }
     return Bad_Request;
 }(HTTP_Error));

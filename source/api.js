@@ -5,7 +5,8 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 var body_parser = require("body-parser");
-var errors_1 = require("./errors");
+var validation_1 = require("./validation");
+var error_handling_1 = require("./error-handling");
 __export(require("./errors"));
 // const json_parser = body_parser.json()
 var json_temp = body_parser.json();
@@ -19,19 +20,6 @@ var Method;
     Method[Method["put"] = 2] = "put";
     Method[Method["delete"] = 3] = "delete";
 })(Method = exports.Method || (exports.Method = {}));
-function handle_error(res, error) {
-    var status = error.status || 500;
-    if (!error.stack)
-        console.error("Error", status, error.message);
-    else
-        console.error("Error", status, error.stack);
-    var message = status == 500 ? "Server Error" : error.message;
-    res.statusMessage = message;
-    res.status(status).send({
-        message: message
-    });
-}
-exports.handle_error = handle_error;
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function get_arguments(req) {
     var result = req.body || {};
@@ -39,11 +27,6 @@ function get_arguments(req) {
         result[i] = req.query[i];
     }
     return result;
-}
-function validate(validator, data, ajv) {
-    if (!validator(data)) {
-        throw new errors_1.Bad_Request(ajv.errors);
-    }
 }
 function create_handler(endpoint, action, ajv) {
     if (endpoint.validator && !ajv)
@@ -57,16 +40,16 @@ function create_handler(endpoint, action, ajv) {
             if (req.params)
                 request.params = req.params;
             if (endpoint.validator)
-                validate(endpoint.validator, request.data, ajv);
+                validation_1.validate(endpoint.validator, request.data, ajv);
             action(request)
                 .then(function (content) {
                 res.send(content);
             }, function (error) {
-                handle_error(res, error);
+                error_handling_1.handleError(res, error);
             });
         }
         catch (error) {
-            handle_error(res, error);
+            error_handling_1.handleError(res, error);
         }
     };
 }

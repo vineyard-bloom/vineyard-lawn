@@ -1,3 +1,4 @@
+/// <reference types="express" />
 import * as express from "express";
 export * from './errors';
 export declare enum Method {
@@ -32,7 +33,6 @@ export interface Optional_Endpoint_Info {
     middleware?: any[];
     filter?: Filter;
 }
-export declare function handle_error(res: any, error: any): void;
 export declare function create_handler(endpoint: Endpoint_Info, action: any, ajv: any): (req: any, res: any) => void;
 export declare function attach_handler(app: express.Application, endpoint: Endpoint_Info, handler: any): void;
 export declare function create_endpoint(app: express.Application, endpoint: Endpoint_Info, preprocessor?: Request_Processor, ajv?: any): void;

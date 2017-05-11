@@ -2,7 +2,8 @@
 
 import * as express from "express"
 import * as body_parser from 'body-parser'
-import {Bad_Request} from "./errors";
+import {validate} from "./validation"
+import {handleError} from "./error-handling"
 export * from './errors'
 
 // const json_parser = body_parser.json()
@@ -47,21 +48,6 @@ export interface Optional_Endpoint_Info {
   filter?: Filter
 }
 
-export function handle_error(res, error) {
-  const status = error.status || 500
-
-  if (!error.stack)
-    console.error("Error", status, error.message)
-  else
-    console.error("Error", status, error.stack)
-
-  const message = status == 500 ? "Server Error" : error.message
-  res.statusMessage = message
-  res.status(status).send({
-    message: message
-  })
-}
-
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function get_arguments(req: express.Request) {
   const result = req.body || {}
@@ -69,12 +55,6 @@ function get_arguments(req: express.Request) {
     result[i] = req.query[i]
   }
   return result
-}
-
-function validate(validator, data: any, ajv) {
-  if (!validator(data)) {
-    throw new Bad_Request(ajv.errors)
-  }
 }
 
 export function create_handler(endpoint: Endpoint_Info, action, ajv) {
@@ -98,11 +78,11 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv) {
             res.send(content)
           },
           function (error) {
-            handle_error(res, error)
+            handleError(res, error)
           })
     }
     catch (error) {
-      handle_error(res, error)
+      handleError(res, error)
     }
   }
 }
@@ -155,4 +135,3 @@ export function create_endpoints(app: express.Application, endpoints: Endpoint_I
     create_endpoint(app, endpoint, preprocessor, ajv)
   }
 }
-

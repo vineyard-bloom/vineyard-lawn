@@ -2,18 +2,20 @@
 
 export class HTTP_Error extends Error {
   status: number
+  body: any
 
-  constructor(message: string = "Server Error", status: number = 500) {
+  constructor(message: string = "Server Error", status: number = 500, body = {}) {
     super(message)
     this.status = status
     this.message = message // super(message) doesn't seem to be working.
+    this.body = body
   }
 }
 
 export class Bad_Request extends HTTP_Error {
 
-  constructor(message: string = "Bad Request") {
-    super(message, 400)
+  constructor(message: string = "Bad Request", body = {}) {
+    super(message, 400, body)
   }
 }
 
