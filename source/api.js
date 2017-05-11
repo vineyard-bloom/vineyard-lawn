@@ -1,5 +1,4 @@
 // Vineyard Lawn
-// created by Christopher W. Johnson
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -21,7 +20,10 @@ var Method;
 })(Method = exports.Method || (exports.Method = {}));
 function handle_error(res, error) {
     var status = error.status || 500;
-    console.error("Error", status, error.message);
+    if (!error.stack)
+        console.error("Error", status, error.message);
+    else
+        console.error("Error", status, error.stack);
     var message = status == 500 ? "Server Error" : error.message;
     res.statusMessage = message;
     res.status(status).send({
@@ -34,6 +36,11 @@ function get_arguments(req) {
     var result = req.body || {};
     for (var i in req.query) {
         result[i] = req.query[i];
+    }
+    if (req.params) {
+        for (var i in req.params) {
+            result[i] = req.params[i];
+        }
     }
     return result;
 }

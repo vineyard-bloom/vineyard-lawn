@@ -1,5 +1,4 @@
 // Vineyard Lawn
-// created by Christopher W. Johnson
 
 import * as express from "express"
 import * as body_parser from 'body-parser'
@@ -20,6 +19,7 @@ export enum Method {
 export interface Request {
   data: any
   session: any
+  user?: any
 }
 
 export type Promise_Or_Void = Promise<void> | void
@@ -45,7 +45,12 @@ export interface Optional_Endpoint_Info {
 
 export function handle_error(res, error) {
   const status = error.status || 500
-  console.error("Error", status, error.message)
+
+  if (!error.stack)
+    console.error("Error", status, error.message)
+  else
+    console.error("Error", status, error.stack)
+
   const message = status == 500 ? "Server Error" : error.message
   res.statusMessage = message
   res.status(status).send({
@@ -58,6 +63,11 @@ function get_arguments(req: express.Request) {
   const result = req.body || {}
   for (let i in req.query) {
     result[i] = req.query[i]
+  }
+  if (req.params) {
+    for (let i in req.params) {
+      result[i] = req.params[i]
+    }
   }
   return result
 }
