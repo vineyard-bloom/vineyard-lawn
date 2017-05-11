@@ -6,11 +6,26 @@ var Server = (function () {
     function Server(default_preprocessor) {
         this.port = 3000;
         this.default_preprocessor = null;
+        this.ajv = null;
         this.app = express();
         this.default_preprocessor = default_preprocessor;
     }
+    Server.prototype.compileApiSchema = function (schema) {
+        if (!this.ajv) {
+            var Ajv = require('ajv');
+            this.ajv = new Ajv();
+        }
+        var result = {};
+        for (var i in schema) {
+            result[i] = this.ajv.compile(schema[i]);
+        }
+        return result;
+    };
+    Server.prototype.createEndpoints = function (endpoints, preprocessor) {
+        api_1.create_endpoints(this.app, endpoints, preprocessor || this.default_preprocessor, this.ajv);
+    };
     Server.prototype.add_endpoints = function (endpoints, preprocessor) {
-        api_1.create_endpoints(this.app, endpoints, preprocessor || this.default_preprocessor);
+        this.createEndpoints(endpoints, preprocessor);
     };
     Server.prototype.enable_cors = function () {
         this.app.use(require('cors')({

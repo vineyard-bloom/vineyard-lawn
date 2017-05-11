@@ -10,19 +10,38 @@ export class Server {
   private node_server
   private port: number = 3000
   private default_preprocessor = null
+  ajv = null
 
-  constructor(default_preprocessor?:Request_Processor) {
+  constructor(default_preprocessor?: Request_Processor) {
     this.app = express()
     this.default_preprocessor = default_preprocessor
   }
 
+  compileApiSchema(schema) {
+    if (!this.ajv) {
+      const Ajv = require('ajv')
+      this.ajv = new Ajv()
+    }
+
+    const result = {}
+    for (let i in schema) {
+      result [i] = this.ajv.compile(schema [i])
+    }
+
+    return result
+  }
+
+  createEndpoints(endpoints, preprocessor?: Request_Processor) {
+    create_endpoints(this.app, endpoints, preprocessor || this.default_preprocessor, this.ajv)
+  }
+
   add_endpoints(endpoints, preprocessor?: Request_Processor) {
-    create_endpoints(this.app, endpoints, preprocessor || this.default_preprocessor)
+    this.createEndpoints(endpoints, preprocessor)
   }
 
   enable_cors() {
     this.app.use(require('cors')({
-      origin: function(origin, callback) {
+      origin: function (origin, callback) {
         callback(null, true)
       },
       credentials: true
@@ -53,7 +72,7 @@ export class Server {
 
 export function start_express(app: express.Application, port): Promise<any> {
   return new Promise<any>((resolve, reject) => {
-    const server = app.listen(port, function(err) {
+    const server = app.listen(port, function (err) {
       if (err)
         reject("Error starting server")
 

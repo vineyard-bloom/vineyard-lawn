@@ -2,6 +2,7 @@
 
 import * as express from "express"
 import * as body_parser from 'body-parser'
+import {Bad_Request} from "./errors";
 export * from './errors'
 
 // const json_parser = body_parser.json()
@@ -20,12 +21,14 @@ export interface Request {
   data: any
   session: any
   user?: any
+  params?: any
 }
 
 export type Promise_Or_Void = Promise<void> | void
 export type Request_Processor = (request: Request) => Promise<Request>
 export type Response_Generator = (request: Request) => Promise<any>
 export type Filter = (request: Request) => Promise_Or_Void
+export type Validator = (data: any) => boolean
 
 export interface Endpoint_Info {
   method: Method
@@ -33,6 +36,7 @@ export interface Endpoint_Info {
   action: Response_Generator
   middleware?: any[]
   filter?: Filter
+  validator?: Validator
 }
 
 export interface Optional_Endpoint_Info {
@@ -64,21 +68,31 @@ function get_arguments(req: express.Request) {
   for (let i in req.query) {
     result[i] = req.query[i]
   }
-  if (req.params) {
-    for (let i in req.params) {
-      result[i] = req.params[i]
-    }
-  }
   return result
 }
 
-export function create_handler(endpoint: Endpoint_Info, action) {
+function validate(validator, data: any, ajv) {
+  if (!validator(data)) {
+    throw new Bad_Request(ajv.errors)
+  }
+}
+
+export function create_handler(endpoint: Endpoint_Info, action, ajv) {
+  if (endpoint.validator && !ajv)
+    throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.")
+
   return function (req, res) {
     try {
-      const request = {
+      const request: Request = {
         data: get_arguments(req),
         session: req.session
       }
+      if (req.params)
+        request.params = req.params
+
+      if (endpoint.validator)
+        validate(endpoint.validator, request.data, ajv)
+
       action(request)
         .then(function (content) {
             res.send(content)
@@ -120,12 +134,12 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 }
 
 export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
-                                preprocessor: Request_Processor = null) {
+                                preprocessor: Request_Processor = null, ajv = null) {
   const action = preprocessor
     ? request => preprocessor(request).then(request => endpoint.action(request))
     : endpoint.action
 
-  const handler = create_handler(endpoint, action)
+  const handler = create_handler(endpoint, action, ajv)
   attach_handler(app, endpoint, handler)
 }
 
@@ -136,9 +150,9 @@ export function create_endpoint_with_defaults(app: express.Application, endpoint
 }
 
 export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                 preprocessor: Request_Processor = null) {
+                                 preprocessor: Request_Processor = null, ajv = null) {
   for (let endpoint of endpoints) {
-    create_endpoint(app, endpoint, preprocessor)
+    create_endpoint(app, endpoint, preprocessor, ajv)
   }
 }
 

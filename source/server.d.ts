@@ -9,7 +9,10 @@ export declare class Server {
     private node_server;
     private port;
     private default_preprocessor;
+    ajv: any;
     constructor(default_preprocessor?: Request_Processor);
+    compileApiSchema(schema: any): {};
+    createEndpoints(endpoints: any, preprocessor?: Request_Processor): void;
     add_endpoints(endpoints: any, preprocessor?: Request_Processor): void;
     enable_cors(): void;
     start(config: Server_Config): Promise<void>;
