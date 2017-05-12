@@ -33,15 +33,15 @@ function create_handler(endpoint, action, ajv) {
         throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.");
     return function (req, res) {
         try {
-            var request = {
+            var request_1 = {
                 data: get_arguments(req),
                 session: req.session
             };
             if (req.params)
-                request.params = req.params;
+                request_1.params = req.params;
             if (endpoint.validator)
-                validation_1.validate(endpoint.validator, request.data, ajv);
-            action(request)
+                validation_1.validate(endpoint.validator, request_1.data, ajv);
+            action(request_1)
                 .then(function (content) {
                 res.send(content);
             }, function (error) {

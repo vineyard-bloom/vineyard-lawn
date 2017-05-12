@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import * as express from "express";
 export * from './errors';
 export declare enum Method {

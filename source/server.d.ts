@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import * as express from "express";
 import { Request_Processor } from "./api";
 export interface Server_Config {
