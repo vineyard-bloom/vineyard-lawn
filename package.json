@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "git@github.com:silentorb/vineyard-lawn.git",
+  "repository": "git@github.com:vineyard-bloom/vineyard-lawn.git",
   "author": "Christopher W. Johnson",
   "license": "MIT",
   "dependencies": {
