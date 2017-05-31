@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var body_parser = require("body-parser");
 var validation_1 = require("./validation");
 var error_handling_1 = require("./error-handling");
+var version_1 = require("./version");
 __export(require("./errors"));
 // const json_parser = body_parser.json()
 var json_temp = body_parser.json();
@@ -33,9 +34,19 @@ function create_handler(endpoint, action, ajv) {
         throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.");
     return function (req, res) {
         try {
+            var version = null;
+            var data = get_arguments(req);
+            if (typeof req.params.version == 'string') {
+                version = new version_1.Version(req.params.version);
+            }
+            else if (typeof data.version == 'string') {
+                version = new version_1.Version(data.version);
+                delete data.version;
+            }
             var request = {
-                data: get_arguments(req),
-                session: req.session
+                data: data,
+                session: req.session,
+                version: version
             };
             if (req.params)
                 request.params = req.params;
@@ -54,12 +65,8 @@ function create_handler(endpoint, action, ajv) {
     };
 }
 exports.create_handler = create_handler;
-function attach_handler(app, endpoint, handler) {
-    var path = endpoint.path;
-    if (path[0] != '/')
-        path = '/' + path;
-    var middleware = endpoint.middleware || [];
-    switch (endpoint.method) {
+function register_http_handler(app, path, method, handler, middleware) {
+    switch (method) {
         case Method.get:
             app.get(path, middleware, handler);
             break;
@@ -73,6 +80,14 @@ function attach_handler(app, endpoint, handler) {
             app.delete(path, [json_parser].concat(middleware), handler);
             break;
     }
+}
+function attach_handler(app, endpoint, handler) {
+    var path = endpoint.path;
+    if (path[0] != '/')
+        path = '/' + path;
+    var middleware = endpoint.middleware || [];
+    register_http_handler(app, path, endpoint.method, handler, middleware);
+    register_http_handler(app, '/:version' + path, endpoint.method, handler, middleware);
 }
 exports.attach_handler = attach_handler;
 function create_endpoint(app, endpoint, preprocessor, ajv) {
@@ -99,4 +114,10 @@ function create_endpoints(app, endpoints, preprocessor, ajv) {
     }
 }
 exports.create_endpoints = create_endpoints;
+function createEndpoints(app, endpoints, preprocessor, ajv) {
+    if (preprocessor === void 0) { preprocessor = null; }
+    if (ajv === void 0) { ajv = null; }
+    return create_endpoints(app, endpoints, preprocessor, ajv);
+}
+exports.createEndpoints = createEndpoints;
 //# sourceMappingURL=api.js.map

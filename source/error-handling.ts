@@ -1,4 +1,3 @@
-
 let logErrors = true
 
 export function setErrorLogging(value: boolean) {
@@ -17,8 +16,15 @@ export function handleError(res, error) {
 
   const message = status == 500 ? "Server Error" : error.message
   res.statusMessage = message
-  const body = error.body || {
-      message: message
+  const body:any = {
+      error: {
+        code: status,
+        message: message
+      }
     }
+    
+  if (error.body && (typeof error.body != 'object' || Object.keys(error.body).length > 0))
+    body.additional = error.body
+
   res.status(status).send(body)
 }
