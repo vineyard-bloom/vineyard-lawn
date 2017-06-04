@@ -11,7 +11,7 @@ Most tools used to create web services are designed primarily to serve HTML page
 * Simplified request objects that only contain the essentials for standard endpoint logic.
 * Merging of POST data and query parameters.
 * Built-in support for JSON Schema validation.
-* A Version class for API versioning.
+* Built-in support for versioning.
 
 If an endpoint needs more flexibility it can bypass Lawn and be directly defined in Express.
 

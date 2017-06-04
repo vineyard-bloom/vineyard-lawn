@@ -1,29 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var logErrors = true;
-function setErrorLogging(value) {
-    logErrors = value;
-}
-exports.setErrorLogging = setErrorLogging;
-function handleError(res, error) {
-    var status = error.status || 500;
-    if (logErrors) {
-        if (!error.stack)
-            console.error("Error", status, error.message);
-        else
-            console.error("Error", status, error.stack);
-    }
-    var message = status == 500 ? "Server Error" : error.message;
+function sendErrorResponse(res, error) {
+    var message = error.message = error.status == 500 ? "Server Error" : error.message;
     res.statusMessage = message;
     var body = {
         error: {
-            code: status,
+            code: error.status,
             message: message
         }
     };
     if (error.body && (typeof error.body != 'object' || Object.keys(error.body).length > 0))
         body.additional = error.body;
-    res.status(status).send(body);
+    error.body = body;
+    res.status(error.status).send(body);
+}
+exports.sendErrorResponse = sendErrorResponse;
+function handleError(res, error, listener, request) {
+    if (request === void 0) { request = null; }
+    error.status = error.status || 500;
+    try {
+        listener.onError(error, request);
+    }
+    catch (error) {
+        console.error('Error while logging http handling error', error);
+    }
+    return sendErrorResponse(res, error);
 }
 exports.handleError = handleError;
 //# sourceMappingURL=error-handling.js.map

@@ -1,31 +1,13 @@
-// Vineyard Lawn
-
 import * as express from "express"
 import * as body_parser from 'body-parser'
 import {validate} from "./validation"
 import {handleError} from "./error-handling"
-import {Version} from "./version";
-import {Bad_Request} from "./errors";
-export * from './errors'
+import {Version} from "./version"
+import {Method, Request, PromiseOrVoid, RequestListener, SimpleResponse} from "./types"
 
-// const json_parser = body_parser.json()
 const json_temp = body_parser.json()
 const json_parser = function (req, res, next) {
   json_temp(req, res, next)
-}
-export enum Method {
-  get,
-  post,
-  put,
-  delete
-}
-
-export interface Request {
-  data: any
-  session: any
-  user?: any
-  params?: any
-  version: Version
 }
 
 export type Promise_Or_Void = Promise<void> | void
@@ -33,6 +15,26 @@ export type Request_Processor = (request: Request) => Promise<Request>
 export type Response_Generator = (request: Request) => Promise<any>
 export type Filter = (request: Request) => Promise_Or_Void
 export type Validator = (data: any) => boolean
+
+export function logErrorToConsole(error) {
+  if (!error.stack)
+    console.error("Error", error.status, error.message)
+  else
+    console.error("Error", error.status, error.stack)
+}
+
+class DefaultRequestListener implements RequestListener {
+
+  onRequest(request: Request, response: SimpleResponse, res): PromiseOrVoid {
+    return
+  }
+
+  onError(error, request?: Request): PromiseOrVoid {
+    logErrorToConsole(error)
+    return
+  }
+
+}
 
 export interface Endpoint_Info {
   method: Method
@@ -60,29 +62,45 @@ function get_arguments(req: express.Request) {
   return result
 }
 
-export function create_handler(endpoint: Endpoint_Info, action, ajv) {
+function formatRequest(req): Request {
+  let version: Version = null
+  const data = get_arguments(req)
+  if (typeof req.params.version == 'string') {
+    version = new Version(req.params.version)
+  }
+  else if (typeof data.version == 'string') {
+    version = new Version(data.version)
+    delete data.version
+  }
+
+  const request: Request = {
+    data: data,
+    session: req.session,
+    version: version,
+    startTime: new Date().getTime()
+  }
+  if (req.params)
+    request.params = req.params
+
+  return request
+}
+
+function logRequest(request: Request, listener: RequestListener, response: SimpleResponse, req) {
+  try {
+    listener.onRequest(request, response, req)
+  }
+  catch (error) {
+    console.error('Error while logging request', error)
+  }
+}
+
+export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: RequestListener) {
   if (endpoint.validator && !ajv)
     throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.")
 
   return function (req, res) {
     try {
-      let version: Version = null
-      const data = get_arguments(req)
-      if (typeof req.params.version == 'string') {
-        version = new Version(req.params.version)
-      }
-      else if (typeof data.version == 'string') {
-        version = new Version(data.version)
-        delete data.version
-      }
-
-      const request: Request = {
-        data: data,
-        session: req.session,
-        version: version
-      }
-      if (req.params)
-        request.params = req.params
+      const request = formatRequest(req)
 
       if (endpoint.validator)
         validate(endpoint.validator, request.data, ajv)
@@ -90,13 +108,24 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv) {
       action(request)
         .then(function (content) {
             res.send(content)
+            logRequest(request, listener, {
+              code: 200,
+              message: "",
+              body: content
+            }, req)
           },
           function (error) {
-            handleError(res, error)
+            handleError(res, error, listener, request)
+            logRequest(request, listener, {
+              code: error.status,
+              message: error.message,
+              body: error.body
+            }, req)
           })
     }
     catch (error) {
-      handleError(res, error)
+      console.error('Error in early request handling stages will result in a missing request log.', error)
+      handleError(res, error, listener, null)
     }
   }
 }
@@ -132,12 +161,13 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 }
 
 export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
-                                preprocessor: Request_Processor = null, ajv = null) {
+                                preprocessor: Request_Processor = null, ajv = null,
+                                listener: RequestListener = new DefaultRequestListener()) {
   const action = preprocessor
     ? request => preprocessor(request).then(request => endpoint.action(request))
     : endpoint.action
 
-  const handler = create_handler(endpoint, action, ajv)
+  const handler = create_handler(endpoint, action, ajv, listener)
   attach_handler(app, endpoint, handler)
 }
 
@@ -148,13 +178,15 @@ export function create_endpoint_with_defaults(app: express.Application, endpoint
 }
 
 export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                 preprocessor: Request_Processor = null, ajv = null) {
+                                 preprocessor: Request_Processor = null, ajv = null,
+                                 listener: RequestListener = new DefaultRequestListener()) {
   for (let endpoint of endpoints) {
-    create_endpoint(app, endpoint, preprocessor, ajv)
+    create_endpoint(app, endpoint, preprocessor, ajv, listener)
   }
 }
 
 export function createEndpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                preprocessor: Request_Processor = null, ajv = null) {
-  return create_endpoints(app, endpoints, preprocessor, ajv)
+                                preprocessor: Request_Processor = null, ajv = null,
+                                listener: RequestListener = new DefaultRequestListener()) {
+  return create_endpoints(app, endpoints, preprocessor, ajv, listener)
 }

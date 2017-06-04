@@ -1,5 +1,6 @@
 import * as express from "express"
 import {create_endpoints, Request_Processor} from "./api"
+import {RequestListener} from "./types";
 
 export interface Server_Config {
   port?: number
@@ -10,11 +11,13 @@ export class Server {
   private node_server
   private port: number = 3000
   private default_preprocessor = null
-  ajv = null
+  private ajv = null
+  private requestListener: RequestListener
 
-  constructor(default_preprocessor?: Request_Processor) {
+  constructor(default_preprocessor: Request_Processor = null, requestedListener: RequestListener = null) {
     this.app = express()
     this.default_preprocessor = default_preprocessor
+    this.requestListener = requestedListener
   }
 
   compileApiSchema(schema) {
@@ -31,8 +34,8 @@ export class Server {
     return result
   }
 
-  createEndpoints(endpoints, preprocessor?: Request_Processor) {
-    create_endpoints(this.app, endpoints, preprocessor || this.default_preprocessor, this.ajv)
+  createEndpoints(endpoints, preprocessor: Request_Processor = this.default_preprocessor) {
+    create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
   }
 
   add_endpoints(endpoints, preprocessor?: Request_Processor) {

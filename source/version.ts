@@ -33,4 +33,9 @@ export class Version {
   equals(version: Version): boolean {
     return this.major == version.major && this.minor == version.minor
   }
+
+  toString(): string {
+    return this.major + '.' + this.minor
+      + (this.platform && this.platform != 'none' ? '.' + this.platform : '')
+  }
 }

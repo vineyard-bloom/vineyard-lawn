@@ -29,6 +29,10 @@ var Version = (function () {
     Version.prototype.equals = function (version) {
         return this.major == version.major && this.minor == version.minor;
     };
+    Version.prototype.toString = function () {
+        return this.major + '.' + this.minor
+            + (this.platform && this.platform != 'none' ? '.' + this.platform : '');
+    };
     return Version;
 }());
 exports.Version = Version;

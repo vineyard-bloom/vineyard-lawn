@@ -5,4 +5,5 @@ export declare class Version {
     private createFromString(text);
     constructor(majorOrString: number | string, minor?: number, platform?: string);
     equals(version: Version): boolean;
+    toString(): string;
 }

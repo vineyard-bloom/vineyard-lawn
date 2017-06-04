@@ -1,5 +1,6 @@
 import * as express from "express";
 import { Request_Processor } from "./api";
+import { RequestListener } from "./types";
 export interface Server_Config {
     port?: number;
 }
@@ -8,8 +9,9 @@ export declare class Server {
     private node_server;
     private port;
     private default_preprocessor;
-    ajv: any;
-    constructor(default_preprocessor?: Request_Processor);
+    private ajv;
+    private requestListener;
+    constructor(default_preprocessor?: Request_Processor, requestedListener?: RequestListener);
     compileApiSchema(schema: any): {};
     createEndpoints(endpoints: any, preprocessor?: Request_Processor): void;
     add_endpoints(endpoints: any, preprocessor?: Request_Processor): void;
