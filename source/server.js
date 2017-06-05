@@ -13,16 +13,30 @@ var Server = (function () {
         this.default_preprocessor = default_preprocessor;
         this.requestListener = requestedListener;
     }
-    Server.prototype.compileApiSchema = function (schema) {
+    Server.prototype.checkAjv = function () {
         if (!this.ajv) {
             var Ajv = require('ajv');
             this.ajv = new Ajv();
         }
+    };
+    Server.prototype.compileApiSchema = function (schema) {
+        this.checkAjv();
         var result = {};
         for (var i in schema) {
+            var entry = schema[i];
+            if (entry.additionalProperties !== true && entry.additionalProperties !== false)
+                entry.additionalProperties = false;
             result[i] = this.ajv.compile(schema[i]);
         }
         return result;
+    };
+    Server.prototype.addApiSchemaHelper = function (schema) {
+        this.checkAjv();
+        this.ajv.addSchema(schema);
+    };
+    Server.prototype.getApiSchema = function () {
+        this.checkAjv();
+        return this.ajv;
     };
     Server.prototype.createEndpoints = function (endpoints, preprocessor) {
         if (preprocessor === void 0) { preprocessor = this.default_preprocessor; }

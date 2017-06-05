@@ -12,7 +12,10 @@ export declare class Server {
     private ajv;
     private requestListener;
     constructor(default_preprocessor?: Request_Processor, requestedListener?: RequestListener);
+    private checkAjv();
     compileApiSchema(schema: any): {};
+    addApiSchemaHelper(schema: any): void;
+    getApiSchema(): any;
     createEndpoints(endpoints: any, preprocessor?: Request_Processor): void;
     add_endpoints(endpoints: any, preprocessor?: Request_Processor): void;
     enable_cors(): void;

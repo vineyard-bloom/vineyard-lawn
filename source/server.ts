@@ -20,18 +20,36 @@ export class Server {
     this.requestListener = requestedListener
   }
 
-  compileApiSchema(schema) {
+  private checkAjv() {
     if (!this.ajv) {
       const Ajv = require('ajv')
       this.ajv = new Ajv()
     }
+  }
+
+  compileApiSchema(schema) {
+    this.checkAjv()
 
     const result = {}
     for (let i in schema) {
-      result [i] = this.ajv.compile(schema [i])
+      const entry = schema[i]
+      if (entry.additionalProperties !== true && entry.additionalProperties !== false)
+        entry.additionalProperties = false
+
+      result [i] = this.ajv.compile(schema[i])
     }
 
     return result
+  }
+
+  addApiSchemaHelper(schema) {
+    this.checkAjv()
+    this.ajv.addSchema(schema)
+  }
+
+  getApiSchema() {
+    this.checkAjv()
+    return this.ajv
   }
 
   createEndpoints(endpoints, preprocessor: Request_Processor = this.default_preprocessor) {
