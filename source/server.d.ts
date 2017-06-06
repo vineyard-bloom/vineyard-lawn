@@ -1,8 +1,14 @@
 import * as express from "express";
 import { Request_Processor } from "./api";
 import { RequestListener } from "./types";
+export interface SSLConfig {
+    enabled?: boolean;
+    publicFile?: string;
+    privateFile?: string;
+}
 export interface Server_Config {
     port?: number;
+    ssl?: SSLConfig;
 }
 export declare class Server {
     private app;
@@ -24,4 +30,4 @@ export declare class Server {
     get_port(): number;
     stop(): void;
 }
-export declare function start_express(app: express.Application, port: any): Promise<any>;
+export declare function start_express(app: express.Application, port: any, ssl: SSLConfig): Promise<any>;

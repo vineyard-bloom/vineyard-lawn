@@ -2,8 +2,15 @@ import * as express from "express"
 import {create_endpoints, Request_Processor} from "./api"
 import {RequestListener} from "./types";
 
+export interface SSLConfig {
+  enabled?: boolean
+  publicFile?: string
+  privateFile?: string
+}
+
 export interface Server_Config {
   port?: number
+  ssl?: SSLConfig
 }
 
 export class Server {
@@ -71,7 +78,7 @@ export class Server {
 
   start(config: Server_Config): Promise<void> {
     this.port = (config && config.port) || 3000
-    return start_express(this.app, this.port)
+    return start_express(this.app, this.port, config.ssl || {})
       .then(server => {
         this.node_server = server
         console.log('Listening on port ' + this.port + '.')
@@ -91,14 +98,31 @@ export class Server {
   }
 }
 
-export function start_express(app: express.Application, port): Promise<any> {
+export function start_express(app: express.Application, port, ssl: SSLConfig): Promise<any> {
   return new Promise<any>((resolve, reject) => {
-    const server = app.listen(port, function (err) {
-      if (err)
-        reject("Error starting server")
+    if (ssl.enabled) {
+      const https = require('https')
+      const fs = require('fs')
+      const server = https.createServer({
+        key: fs.readFileSync(ssl.privateFile),
+        cert: fs.readFileSync(ssl.publicFile)
+      }, app)
+        .listen(port, function (err) {
+          if (err)
+            reject("Error starting server (SSL)")
 
-      console.log('API is listening on port ' + port)
-      resolve(server)
-    })
+          console.log('API is listening on port ' + port + ' (SSL)')
+          resolve(server)
+        })
+    }
+    else {
+      const server = app.listen(port, function (err) {
+        if (err)
+          reject("Error starting server")
+
+        console.log('API is listening on port ' + port)
+        resolve(server)
+      })
+    }
   })
 }

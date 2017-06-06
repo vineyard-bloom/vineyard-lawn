@@ -56,7 +56,7 @@ var Server = (function () {
     Server.prototype.start = function (config) {
         var _this = this;
         this.port = (config && config.port) || 3000;
-        return start_express(this.app, this.port)
+        return start_express(this.app, this.port, config.ssl || {})
             .then(function (server) {
             _this.node_server = server;
             console.log('Listening on port ' + _this.port + '.');
@@ -74,14 +74,30 @@ var Server = (function () {
     return Server;
 }());
 exports.Server = Server;
-function start_express(app, port) {
+function start_express(app, port, ssl) {
     return new Promise(function (resolve, reject) {
-        var server = app.listen(port, function (err) {
-            if (err)
-                reject("Error starting server");
-            console.log('API is listening on port ' + port);
-            resolve(server);
-        });
+        if (ssl.enabled) {
+            var https = require('https');
+            var fs = require('fs');
+            var server_1 = https.createServer({
+                key: fs.readFileSync(ssl.privateFile),
+                cert: fs.readFileSync(ssl.publicFile)
+            }, app)
+                .listen(port, function (err) {
+                if (err)
+                    reject("Error starting server (SSL)");
+                console.log('API is listening on port ' + port + ' (SSL)');
+                resolve(server_1);
+            });
+        }
+        else {
+            var server_2 = app.listen(port, function (err) {
+                if (err)
+                    reject("Error starting server");
+                console.log('API is listening on port ' + port);
+                resolve(server_2);
+            });
+        }
     });
 }
 exports.start_express = start_express;
