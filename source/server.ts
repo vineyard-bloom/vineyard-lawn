@@ -103,9 +103,18 @@ export function start_express(app: express.Application, port, ssl: SSLConfig): P
     if (ssl.enabled) {
       const https = require('https')
       const fs = require('fs')
+      let privateCert, publicCert
+      try {
+        privateCert = fs.readFileSync(ssl.privateFile)
+        publicCert = fs.readFileSync(ssl.publicFile)
+      }
+      catch (error) {
+        console.error('Error loading ssl cert file.', error)
+        reject(error)
+      }
       const server = https.createServer({
-        key: fs.readFileSync(ssl.privateFile),
-        cert: fs.readFileSync(ssl.publicFile)
+        key: privateCert,
+        cert: publicCert
       }, app)
         .listen(port, function (err) {
           if (err)
