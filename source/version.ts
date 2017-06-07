@@ -1,5 +1,5 @@
 import {Bad_Request} from "./errors";
-const pattern = /(\d+)\.(\d+)(\.[a-z]+)?/
+const pattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/
 const defaultPlatform = 'none'
 
 export class Version {

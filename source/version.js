@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var errors_1 = require("./errors");
-var pattern = /(\d+)\.(\d+)(\.[a-z]+)?/;
+var pattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/;
 var defaultPlatform = 'none';
 var Version = (function () {
     function Version(majorOrString, minor, platform) {

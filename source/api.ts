@@ -4,6 +4,7 @@ import {validate} from "./validation"
 import {handleError} from "./error-handling"
 import {Version} from "./version"
 import {Method, Request, PromiseOrVoid, RequestListener, SimpleResponse} from "./types"
+import {Bad_Request} from "./errors";
 
 const json_temp = body_parser.json()
 const json_parser = function (req, res, next) {
@@ -62,21 +63,27 @@ function get_arguments(req: express.Request) {
   return result
 }
 
-function formatRequest(req): Request {
+function getVersion(req, data): Version {
   let version: Version = null
-  const data = get_arguments(req)
   if (typeof req.params.version == 'string') {
-    version = new Version(req.params.version)
+    return new Version(req.params.version)
   }
   else if (typeof data.version == 'string') {
-    version = new Version(data.version)
+    const version = new Version(data.version)
     delete data.version
+    return version
   }
+
+  throw new Bad_Request("Missing version property.")
+}
+
+function formatRequest(req): Request {
+  const data = get_arguments(req)
 
   const request: Request = {
     data: data,
     session: req.session,
-    version: version,
+    version: null,
     startTime: new Date().getTime()
   }
   if (req.params)
@@ -99,8 +106,19 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
     throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.")
 
   return function (req, res) {
+    let request
+
     try {
-      const request = formatRequest(req)
+      request = formatRequest(req)
+    }
+    catch (error) {
+      console.error('Error in early request handling stages will result in a missing request log.', error)
+      handleError(res, error, listener, null)
+      return
+    }
+
+    try {
+      request.version = getVersion(req, request.data)
 
       if (endpoint.validator)
         validate(endpoint.validator, request.data, ajv)
@@ -124,8 +142,15 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
           })
     }
     catch (error) {
-      console.error('Error in early request handling stages will result in a missing request log.', error)
       handleError(res, error, listener, null)
+      if (!request.version)
+        request.version = new Version(0, 0, 'error')
+
+      logRequest(request, listener, {
+        code: error.status,
+        message: error.message,
+        body: error.body
+      }, req)
     }
   }
 }

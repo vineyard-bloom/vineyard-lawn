@@ -5,6 +5,7 @@ var validation_1 = require("./validation");
 var error_handling_1 = require("./error-handling");
 var version_1 = require("./version");
 var types_1 = require("./types");
+var errors_1 = require("./errors");
 var json_temp = body_parser.json();
 var json_parser = function (req, res, next) {
     json_temp(req, res, next);
@@ -36,20 +37,24 @@ function get_arguments(req) {
     }
     return result;
 }
-function formatRequest(req) {
+function getVersion(req, data) {
     var version = null;
-    var data = get_arguments(req);
     if (typeof req.params.version == 'string') {
-        version = new version_1.Version(req.params.version);
+        return new version_1.Version(req.params.version);
     }
     else if (typeof data.version == 'string') {
-        version = new version_1.Version(data.version);
+        var version_2 = new version_1.Version(data.version);
         delete data.version;
+        return version_2;
     }
+    throw new errors_1.Bad_Request("Missing version property.");
+}
+function formatRequest(req) {
+    var data = get_arguments(req);
     var request = {
         data: data,
         session: req.session,
-        version: version,
+        version: null,
         startTime: new Date().getTime()
     };
     if (req.params)
@@ -68,21 +73,30 @@ function create_handler(endpoint, action, ajv, listener) {
     if (endpoint.validator && !ajv)
         throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.");
     return function (req, res) {
+        var request;
         try {
-            var request_1 = formatRequest(req);
+            request = formatRequest(req);
+        }
+        catch (error) {
+            console.error('Error in early request handling stages will result in a missing request log.', error);
+            error_handling_1.handleError(res, error, listener, null);
+            return;
+        }
+        try {
+            request.version = getVersion(req, request.data);
             if (endpoint.validator)
-                validation_1.validate(endpoint.validator, request_1.data, ajv);
-            action(request_1)
+                validation_1.validate(endpoint.validator, request.data, ajv);
+            action(request)
                 .then(function (content) {
                 res.send(content);
-                logRequest(request_1, listener, {
+                logRequest(request, listener, {
                     code: 200,
                     message: "",
                     body: content
                 }, req);
             }, function (error) {
-                error_handling_1.handleError(res, error, listener, request_1);
-                logRequest(request_1, listener, {
+                error_handling_1.handleError(res, error, listener, request);
+                logRequest(request, listener, {
                     code: error.status,
                     message: error.message,
                     body: error.body
@@ -90,8 +104,14 @@ function create_handler(endpoint, action, ajv, listener) {
             });
         }
         catch (error) {
-            console.error('Error in early request handling stages will result in a missing request log.', error);
             error_handling_1.handleError(res, error, listener, null);
+            if (!request.version)
+                request.version = new version_1.Version(0, 0, 'error');
+            logRequest(request, listener, {
+                code: error.status,
+                message: error.message,
+                body: error.body
+            }, req);
         }
     };
 }
