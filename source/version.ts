@@ -10,7 +10,7 @@ export class Version {
   private createFromString(text: string) {
     const match = text.match(pattern)
     if (!match)
-      throw new Bad_Request('Invalid version format.')
+      throw new Bad_Request('Invalid version format: ' + text)
 
     this.major = parseInt(match[1])
     this.minor = parseInt(match [2])

@@ -19,7 +19,7 @@ var Version = (function () {
     Version.prototype.createFromString = function (text) {
         var match = text.match(pattern);
         if (!match)
-            throw new errors_1.Bad_Request('Invalid version format.');
+            throw new errors_1.Bad_Request('Invalid version format: ' + text);
         this.major = parseInt(match[1]);
         this.minor = parseInt(match[2]);
         this.platform = match[3]
