@@ -1,6 +1,6 @@
 {
   "name": "vineyard-lawn",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "description": "Library for creating Node.js web services",
   "main": "source/index.js",
   "types": "source/index.d.ts",
