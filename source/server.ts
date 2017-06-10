@@ -93,8 +93,10 @@ export class Server {
     return this.port
   }
 
-  stop() {
-    this.node_server.close()
+  stop(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.node_server.close(() => resolve())
+    })
   }
 }
 

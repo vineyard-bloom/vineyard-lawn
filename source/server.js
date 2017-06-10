@@ -69,7 +69,10 @@ var Server = (function () {
         return this.port;
     };
     Server.prototype.stop = function () {
-        this.node_server.close();
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.node_server.close(function () { return resolve(); });
+        });
     };
     return Server;
 }());
@@ -79,11 +82,11 @@ function start_express(app, port, ssl) {
         try {
             if (ssl.enabled) {
                 var https = require('https');
-                var fs_1 = require('fs');
+                var fs = require('fs');
                 var privateCert = void 0, publicCert = void 0;
                 try {
-                    privateCert = fs_1.readFileSync(ssl.privateFile);
-                    publicCert = fs_1.readFileSync(ssl.publicFile);
+                    privateCert = fs.readFileSync(ssl.privateFile);
+                    publicCert = fs.readFileSync(ssl.publicFile);
                 }
                 catch (error) {
                     console.error('Error loading ssl cert file.', error);

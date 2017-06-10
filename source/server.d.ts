@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import * as express from "express";
 import { Request_Processor } from "./api";
 import { RequestListener } from "./types";
@@ -29,6 +28,6 @@ export declare class Server {
     start(config: Server_Config): Promise<void>;
     get_app(): any;
     get_port(): number;
-    stop(): void;
+    stop(): Promise<void>;
 }
 export declare function start_express(app: express.Application, port: any, ssl: SSLConfig): Promise<any>;
