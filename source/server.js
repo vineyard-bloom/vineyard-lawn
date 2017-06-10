@@ -76,36 +76,41 @@ var Server = (function () {
 exports.Server = Server;
 function start_express(app, port, ssl) {
     return new Promise(function (resolve, reject) {
-        if (ssl.enabled) {
-            var https = require('https');
-            var fs = require('fs');
-            var privateCert = void 0, publicCert = void 0;
-            try {
-                privateCert = fs.readFileSync(ssl.privateFile);
-                publicCert = fs.readFileSync(ssl.publicFile);
+        try {
+            if (ssl.enabled) {
+                var https = require('https');
+                var fs_1 = require('fs');
+                var privateCert = void 0, publicCert = void 0;
+                try {
+                    privateCert = fs_1.readFileSync(ssl.privateFile);
+                    publicCert = fs_1.readFileSync(ssl.publicFile);
+                }
+                catch (error) {
+                    console.error('Error loading ssl cert file.', error);
+                    reject(error);
+                }
+                var server_1 = https.createServer({
+                    key: privateCert,
+                    cert: publicCert
+                }, app)
+                    .listen(port, function (err) {
+                    if (err)
+                        reject("Error starting server (SSL)");
+                    console.log('API is listening on port ' + port + ' (SSL)');
+                    resolve(server_1);
+                });
             }
-            catch (error) {
-                console.error('Error loading ssl cert file.', error);
-                reject(error);
+            else {
+                var server_2 = app.listen(port, function (err) {
+                    if (err)
+                        reject("Error starting server");
+                    console.log('API is listening on port ' + port);
+                    resolve(server_2);
+                });
             }
-            var server_1 = https.createServer({
-                key: privateCert,
-                cert: publicCert
-            }, app)
-                .listen(port, function (err) {
-                if (err)
-                    reject("Error starting server (SSL)");
-                console.log('API is listening on port ' + port + ' (SSL)');
-                resolve(server_1);
-            });
         }
-        else {
-            var server_2 = app.listen(port, function (err) {
-                if (err)
-                    reject("Error starting server");
-                console.log('API is listening on port ' + port);
-                resolve(server_2);
-            });
+        catch (error) {
+            reject(error);
         }
     });
 }

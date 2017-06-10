@@ -100,38 +100,43 @@ export class Server {
 
 export function start_express(app: express.Application, port, ssl: SSLConfig): Promise<any> {
   return new Promise<any>((resolve, reject) => {
-    if (ssl.enabled) {
-      const https = require('https')
-      const fs = require('fs')
-      let privateCert, publicCert
-      try {
-        privateCert = fs.readFileSync(ssl.privateFile)
-        publicCert = fs.readFileSync(ssl.publicFile)
-      }
-      catch (error) {
-        console.error('Error loading ssl cert file.', error)
-        reject(error)
-      }
-      const server = https.createServer({
-        key: privateCert,
-        cert: publicCert
-      }, app)
-        .listen(port, function (err) {
-          if (err)
-            reject("Error starting server (SSL)")
+    try {
+      if (ssl.enabled) {
+        const https = require('https')
+        const fs = require('fs')
+        let privateCert, publicCert
+        try {
+          privateCert = fs.readFileSync(ssl.privateFile)
+          publicCert = fs.readFileSync(ssl.publicFile)
+        }
+        catch (error) {
+          console.error('Error loading ssl cert file.', error)
+          reject(error)
+        }
+        const server = https.createServer({
+          key: privateCert,
+          cert: publicCert
+        }, app)
+          .listen(port, function (err) {
+            if (err)
+              reject("Error starting server (SSL)")
 
-          console.log('API is listening on port ' + port + ' (SSL)')
+            console.log('API is listening on port ' + port + ' (SSL)')
+            resolve(server)
+          })
+      }
+      else {
+        const server = app.listen(port, function (err) {
+          if (err)
+            reject("Error starting server")
+
+          console.log('API is listening on port ' + port)
           resolve(server)
         })
+      }
     }
-    else {
-      const server = app.listen(port, function (err) {
-        if (err)
-          reject("Error starting server")
-
-        console.log('API is listening on port ' + port)
-        resolve(server)
-      })
+    catch (error) {
+      reject(error)
     }
   })
 }
