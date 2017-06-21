@@ -86,7 +86,7 @@ function create_handler(endpoint, action, ajv, listener) {
             request.version = getVersion(req, request.data);
             if (endpoint.validator)
                 validation_1.validate(endpoint.validator, request.data, ajv);
-            action(request)
+            action(request, req)
                 .then(function (content) {
                 res.send(content);
                 logRequest(request, listener, {

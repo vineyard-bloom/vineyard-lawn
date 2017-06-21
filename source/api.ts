@@ -123,7 +123,7 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
       if (endpoint.validator)
         validate(endpoint.validator, request.data, ajv)
 
-      action(request)
+      action(request, req)
         .then(function (content) {
             res.send(content)
             logRequest(request, listener, {
