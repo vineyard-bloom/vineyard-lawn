@@ -84,7 +84,8 @@ function formatRequest(req): Request {
     data: data,
     session: req.session,
     version: null,
-    startTime: new Date().getTime()
+    startTime: new Date().getTime(),
+    original: req
   }
   if (req.params)
     request.params = req.params
@@ -123,7 +124,7 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
       if (endpoint.validator)
         validate(endpoint.validator, request.data, ajv)
 
-      action(request, req)
+      action(request)
         .then(function (content) {
             res.send(content)
             logRequest(request, listener, {

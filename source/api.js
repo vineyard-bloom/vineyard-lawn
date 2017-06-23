@@ -55,7 +55,8 @@ function formatRequest(req) {
         data: data,
         session: req.session,
         version: null,
-        startTime: new Date().getTime()
+        startTime: new Date().getTime(),
+        original: req
     };
     if (req.params)
         request.params = req.params;
@@ -86,7 +87,7 @@ function create_handler(endpoint, action, ajv, listener) {
             request.version = getVersion(req, request.data);
             if (endpoint.validator)
                 validation_1.validate(endpoint.validator, request.data, ajv);
-            action(request, req)
+            action(request)
                 .then(function (content) {
                 res.send(content);
                 logRequest(request, listener, {
