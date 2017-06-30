@@ -24,7 +24,7 @@ export function logErrorToConsole(error) {
     console.error("Error", error.status, error.stack)
 }
 
-class DefaultRequestListener implements RequestListener {
+export class DefaultRequestListener implements RequestListener {
 
   onRequest(request: Request, response: SimpleResponse, res): PromiseOrVoid {
     return

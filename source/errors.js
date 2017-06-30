@@ -1,5 +1,5 @@
-// Lawn will handle any type of thrown errors, but also provides these helper Error types.
 "use strict";
+// Lawn will handle any type of thrown errors, but also provides these helper Error types.
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||

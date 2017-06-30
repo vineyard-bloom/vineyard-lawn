@@ -1,11 +1,16 @@
+/// <reference types="express" />
 import * as express from "express";
-import { Method, Request, RequestListener } from "./types";
+import { Method, Request, PromiseOrVoid, RequestListener, SimpleResponse } from "./types";
 export declare type Promise_Or_Void = Promise<void> | void;
 export declare type Request_Processor = (request: Request) => Promise<Request>;
 export declare type Response_Generator = (request: Request) => Promise<any>;
 export declare type Filter = (request: Request) => Promise_Or_Void;
 export declare type Validator = (data: any) => boolean;
 export declare function logErrorToConsole(error: any): void;
+export declare class DefaultRequestListener implements RequestListener {
+    onRequest(request: Request, response: SimpleResponse, res: any): PromiseOrVoid;
+    onError(error: any, request?: Request): PromiseOrVoid;
+}
 export interface Endpoint_Info {
     method: Method;
     path: string;

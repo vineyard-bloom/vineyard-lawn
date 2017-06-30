@@ -5,7 +5,7 @@ var api_1 = require("./api");
 var Server = (function () {
     function Server(default_preprocessor, requestedListener) {
         if (default_preprocessor === void 0) { default_preprocessor = null; }
-        if (requestedListener === void 0) { requestedListener = null; }
+        if (requestedListener === void 0) { requestedListener = new api_1.DefaultRequestListener(); }
         this.port = 3000;
         this.default_preprocessor = null;
         this.ajv = null;

@@ -2,3 +2,4 @@
 node_modules
 npm-*
 *.js.map
+yarn.lock
