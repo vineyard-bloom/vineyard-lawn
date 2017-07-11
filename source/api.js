@@ -29,6 +29,7 @@ var DefaultRequestListener = (function () {
     };
     return DefaultRequestListener;
 }());
+exports.DefaultRequestListener = DefaultRequestListener;
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function get_arguments(req) {
     var result = req.body || {};

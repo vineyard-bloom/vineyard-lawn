@@ -1,5 +1,5 @@
 import * as express from "express"
-import {create_endpoints, Request_Processor} from "./api"
+import {create_endpoints, DefaultRequestListener, Request_Processor} from "./api"
 import {RequestListener} from "./types";
 
 export interface SSLConfig {
@@ -21,7 +21,7 @@ export class Server {
   private ajv = null
   private requestListener: RequestListener
 
-  constructor(default_preprocessor: Request_Processor = null, requestedListener: RequestListener = null) {
+  constructor(default_preprocessor: Request_Processor = null, requestedListener: RequestListener = new DefaultRequestListener()) {
     this.app = express()
     this.default_preprocessor = default_preprocessor
     this.requestListener = requestedListener
