@@ -28,40 +28,14 @@ var HTTP_Error = (function (_super) {
 exports.HTTP_Error = HTTP_Error;
 var Bad_Request = (function (_super) {
     __extends(Bad_Request, _super);
-    function Bad_Request(message, bodyOrKey) {
+    function Bad_Request(message, body) {
         if (message === void 0) { message = "Bad Request"; }
-        if (bodyOrKey === void 0) { bodyOrKey = {}; }
-        var _this = this;
-        if (typeof bodyOrKey === 'string') {
-            _this = _super.call(this, message, 400) || this;
-            _this.key = bodyOrKey;
-        }
-        else {
-            _this = _super.call(this, message, 400, bodyOrKey) || this;
-        }
-        return _this;
+        if (body === void 0) { body = {}; }
+        return _super.call(this, message, 400, body) || this;
     }
     return Bad_Request;
 }(HTTP_Error));
 exports.Bad_Request = Bad_Request;
-var BadRequest = (function (_super) {
-    __extends(BadRequest, _super);
-    function BadRequest(message, bodyOrKey) {
-        if (message === void 0) { message = "Bad Request"; }
-        if (bodyOrKey === void 0) { bodyOrKey = {}; }
-        var _this = this;
-        if (typeof bodyOrKey === 'string') {
-            _this = _super.call(this, message, 400) || this;
-            _this.key = bodyOrKey;
-        }
-        else {
-            _this = _super.call(this, message, 400, bodyOrKey) || this;
-        }
-        return _this;
-    }
-    return BadRequest;
-}(HTTP_Error));
-exports.BadRequest = BadRequest;
 var Needs_Login = (function (_super) {
     __extends(Needs_Login, _super);
     function Needs_Login(message) {

@@ -24,7 +24,7 @@ export function logErrorToConsole(error) {
     console.error("Error", error.status, error.stack)
 }
 
-export class DefaultRequestListener implements RequestListener {
+class DefaultRequestListener implements RequestListener {
 
   onRequest(request: Request, response: SimpleResponse, res): PromiseOrVoid {
     return
@@ -84,8 +84,7 @@ function formatRequest(req): Request {
     data: data,
     session: req.session,
     version: null,
-    startTime: new Date().getTime(),
-    original: req
+    startTime: new Date().getTime()
   }
   if (req.params)
     request.params = req.params

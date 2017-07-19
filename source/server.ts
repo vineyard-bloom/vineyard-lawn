@@ -1,6 +1,6 @@
 import * as express from "express"
-import {create_endpoints, DefaultRequestListener, Request_Processor} from "./api"
-import {RequestListener} from "./types";
+import {create_endpoints, Request_Processor} from "./api"
+import {RequestListener, ValidationCompiler} from "./types"
 
 export interface SSLConfig {
   enabled?: boolean
@@ -13,7 +13,7 @@ export interface Server_Config {
   ssl?: SSLConfig
 }
 
-export class Server {
+export class Server implements ValidationCompiler {
   private app
   private node_server
   private port: number = 3000
@@ -21,7 +21,7 @@ export class Server {
   private ajv = null
   private requestListener: RequestListener
 
-  constructor(default_preprocessor: Request_Processor = null, requestedListener: RequestListener = new DefaultRequestListener()) {
+  constructor(default_preprocessor: Request_Processor = null, requestedListener: RequestListener = null) {
     this.app = express()
     this.default_preprocessor = default_preprocessor
     this.requestListener = requestedListener

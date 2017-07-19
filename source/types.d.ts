@@ -13,7 +13,6 @@ export interface Request {
     params?: any;
     version: Version;
     startTime?: any;
-    original: any;
 }
 export interface SimpleResponse {
     code: number;
@@ -23,4 +22,7 @@ export interface SimpleResponse {
 export interface RequestListener {
     onRequest(request: Request, response: SimpleResponse, req: any): PromiseOrVoid;
     onError(error: any, request?: Request): PromiseOrVoid;
+}
+export interface ValidationCompiler {
+    compileApiSchema(schema: any): any;
 }

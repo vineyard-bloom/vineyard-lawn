@@ -1,6 +1,6 @@
 import * as express from "express";
 import { Request_Processor } from "./api";
-import { RequestListener } from "./types";
+import { RequestListener, ValidationCompiler } from "./types";
 export interface SSLConfig {
     enabled?: boolean;
     publicFile?: string;
@@ -10,7 +10,7 @@ export interface Server_Config {
     port?: number;
     ssl?: SSLConfig;
 }
-export declare class Server {
+export declare class Server implements ValidationCompiler {
     private app;
     private node_server;
     private port;

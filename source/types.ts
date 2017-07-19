@@ -15,7 +15,6 @@ export interface Request {
   params?: any
   version: Version
   startTime?
-  original:any
 }
 
 export interface SimpleResponse {
@@ -25,6 +24,10 @@ export interface SimpleResponse {
 }
 
 export interface RequestListener {
-  onRequest(request: Request, response:SimpleResponse, req): PromiseOrVoid
-  onError(error ,request?: Request): PromiseOrVoid
+  onRequest(request: Request, response: SimpleResponse, req): PromiseOrVoid
+  onError(error, request?: Request): PromiseOrVoid
+}
+
+export interface ValidationCompiler {
+  compileApiSchema(schema: any): any
 }
