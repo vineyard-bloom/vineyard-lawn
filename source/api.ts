@@ -84,6 +84,7 @@ function formatRequest(req): Request {
     data: data,
     session: req.session,
     version: null,
+    original: req,
     startTime: new Date().getTime()
   }
   if (req.params)
