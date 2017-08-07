@@ -8,6 +8,7 @@ const messageFormatters = {
     return new Bad_Request({
       key: 'max-length',
       data: {
+        msg: error.dataPath.substr(1) + ' can not be more than ' + error.params.limit + ' characters.',
         field: error.dataPath.substr(1),
         limit: error.params.limit
       }
@@ -16,6 +17,7 @@ const messageFormatters = {
 
   minLength: function (error) {
     return new Bad_Request({
+      msg: error.dataPath.substr(1) + ' must be at least ' + error.params.limit + ' characters.',
       key: 'min-length',
       data: {
         field: error.dataPath.substr(1),
@@ -32,6 +34,7 @@ const messageFormatters = {
       const value = data[property]
       const character = value.match(findInvalid)
       return new Bad_Request({
+        msg: 'Invalid char "' + character[0] + '" in "' + property,
         key: "invalid-char",
         data: {
           char: character[0],
