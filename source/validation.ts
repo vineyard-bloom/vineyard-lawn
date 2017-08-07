@@ -5,21 +5,23 @@ const characterPattern = /^\^\[(.*?)\][*+]\$$/
 const messageFormatters = {
 
   maxLength: function (error) {
-    return new Bad_Request({
-      key: 'max-length',
-      data: {
-        field: error.dataPath.substr(1),
+    return new Bad_Request(error.dataPath.substr(1) + ' can not be more than ' + error.params.limit + ' characters.',
+      {
+        key: 'max-length',
+        data: {
+          field: error.dataPath.substr(1),
         limit: error.params.limit
       }
     })
   },
 
   minLength: function (error) {
-    return new Bad_Request({
-      key: 'min-length',
-      data: {
-        field: error.dataPath.substr(1),
-        limit: error.params.limit
+    return new Bad_Request(error.dataPath.substr(1) + ' must be at least ' + error.params.limit + ' characters.',
+      {
+        key: 'min-length',
+        data: {
+          field: error.dataPath.substr(1),
+          limit: error.params.limit
       }
     });
   },
@@ -31,11 +33,12 @@ const messageFormatters = {
       const findInvalid = new RegExp('[^' + match[1] + ']')
       const value = data[property]
       const character = value.match(findInvalid)
-      return new Bad_Request({
-        key: "invalid-char",
-        data: {
-          char: character[0],
-          field: property
+      return new Bad_Request('Invalid char "' + character[0] + '" in "' + property,
+        {
+          key: "invalid-char",
+          data: {
+            char: character[0],
+            field: property
         }
       })
     }
