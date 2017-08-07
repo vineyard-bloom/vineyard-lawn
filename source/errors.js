@@ -38,6 +38,7 @@ var Bad_Request = (function (_super) {
         }
         else {
             _this = _super.call(this, message, 400, bodyOrKey) || this;
+            _this.key = bodyOrKey.key;
         }
         return _this;
     }
@@ -56,6 +57,7 @@ var BadRequest = (function (_super) {
         }
         else {
             _this = _super.call(this, message, 400, bodyOrKey) || this;
+            _this.key = bodyOrKey.key;
         }
         return _this;
     }

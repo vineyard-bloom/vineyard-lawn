@@ -4,7 +4,7 @@ var errors_1 = require("./errors");
 var characterPattern = /^\^\[(.*?)\][*+]\$$/;
 var messageFormatters = {
     maxLength: function (error) {
-        return new errors_1.Bad_Request({
+        return new errors_1.Bad_Request(error.dataPath.substr(1) + ' can not be more than ' + error.params.limit + ' characters.', {
             key: 'max-length',
             data: {
                 field: error.dataPath.substr(1),
@@ -13,7 +13,7 @@ var messageFormatters = {
         });
     },
     minLength: function (error) {
-        return new errors_1.Bad_Request({
+        return new errors_1.Bad_Request(error.dataPath.substr(1) + ' must be at least ' + error.params.limit + ' characters.', {
             key: 'min-length',
             data: {
                 field: error.dataPath.substr(1),
@@ -28,7 +28,7 @@ var messageFormatters = {
             var findInvalid = new RegExp('[^' + match[1] + ']');
             var value = data[property];
             var character = value.match(findInvalid);
-            return new errors_1.Bad_Request({
+            return new errors_1.Bad_Request('Invalid char "' + character[0] + '" in "' + property, {
                 key: "invalid-char",
                 data: {
                     char: character[0],
