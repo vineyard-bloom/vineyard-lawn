@@ -4,10 +4,22 @@ var errors_1 = require("./errors");
 var characterPattern = /^\^\[(.*?)\][*+]\$$/;
 var messageFormatters = {
     maxLength: function (error) {
-        return error.dataPath.substr(1) + " can not be more than " + error.params.limit + " characters.";
+        return new errors_1.Bad_Request({
+            key: 'max-length',
+            data: {
+                field: error.dataPath.substr(1),
+                limit: error.params.limit
+            }
+        });
     },
     minLength: function (error) {
-        return error.dataPath.substr(1) + " must be at least " + error.params.limit + " characters.";
+        return new errors_1.Bad_Request({
+            key: 'min-length',
+            data: {
+                field: error.dataPath.substr(1),
+                limit: error.params.limit
+            }
+        });
     },
     pattern: function (error, data) {
         var property = error.dataPath.substr(1);
@@ -16,7 +28,13 @@ var messageFormatters = {
             var findInvalid = new RegExp('[^' + match[1] + ']');
             var value = data[property];
             var character = value.match(findInvalid);
-            return "Invalid character '" + character[0] + "' in " + property + '.';
+            return new errors_1.Bad_Request({
+                key: "invalid-char",
+                data: {
+                    char: character[0],
+                    field: property
+                }
+            });
         }
         return property + ' ' + error.message;
     },
@@ -46,7 +64,12 @@ function validate(validator, data, ajv) {
         var errors = validator.errors.map(function (e) { return formatErrorMessage(e, data); });
         // It seems like ajv should be returning multiple errors but it's only returning the first error.
         // throw new Bad_Request(errors[0], {errors: errors})
-        throw new errors_1.Bad_Request(errors[0]);
+        if (typeof errors[0] === 'string') {
+            throw new errors_1.Bad_Request(errors[0]);
+        }
+        else {
+            throw errors[0];
+        }
     }
 }
 exports.validate = validate;
