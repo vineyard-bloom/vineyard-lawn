@@ -22,6 +22,7 @@ export class Bad_Request extends HTTP_Error {
     }
     else {
       super(message, 400, bodyOrKey)
+      this.key = bodyOrKey.key
     }
   }
 }
@@ -35,6 +36,7 @@ export class BadRequest extends HTTP_Error {
     }
     else {
       super(message, 400, bodyOrKey)
+      this.key = bodyOrKey.key
     }
   }
 }
