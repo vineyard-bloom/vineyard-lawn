@@ -27,6 +27,8 @@ var messageFormatters = {
         if (match = error.params.pattern.match(characterPattern)) {
             var findInvalid = new RegExp('[^' + match[1] + ']');
             var value = data[property];
+            if (!value || !value.match)
+                return new errors_1.Bad_Request('Invalid value for property "' + property + '"');
             var character = value.match(findInvalid);
             return new errors_1.Bad_Request('Invalid char "' + character[0] + '" in "' + property, {
                 key: "invalid-char",

@@ -10,9 +10,9 @@ const messageFormatters = {
         key: 'max-length',
         data: {
           field: error.dataPath.substr(1),
-        limit: error.params.limit
-      }
-    })
+          limit: error.params.limit
+        }
+      })
   },
 
   minLength: function (error) {
@@ -22,8 +22,8 @@ const messageFormatters = {
         data: {
           field: error.dataPath.substr(1),
           limit: error.params.limit
-      }
-    });
+        }
+      });
   },
 
   pattern: function (error, data) {
@@ -32,6 +32,9 @@ const messageFormatters = {
     if (match = error.params.pattern.match(characterPattern)) {
       const findInvalid = new RegExp('[^' + match[1] + ']')
       const value = data[property]
+      if (!value || !value.match)
+        return new Bad_Request('Invalid value for property "' + property + '"')
+
       const character = value.match(findInvalid)
       return new Bad_Request('Invalid char "' + character[0] + '" in "' + property,
         {
@@ -39,8 +42,8 @@ const messageFormatters = {
           data: {
             char: character[0],
             field: property
-        }
-      })
+          }
+        })
     }
 
     return property + ' ' + error.message
@@ -82,6 +85,6 @@ export function validate(validator, data: any, ajv) {
     } else {
       throw errors[0]
     }
-    
+
   }
 }
