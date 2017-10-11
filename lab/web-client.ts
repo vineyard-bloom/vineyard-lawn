@@ -7,7 +7,7 @@ export class WebClient {
     this.url = url;
   }
 
-  private request(method, path, params, data) {
+  private request(method: string, path: string, params: any, data: any) {
     return promiseRequest({
       method: method,
       url: this.url + '/' + path,

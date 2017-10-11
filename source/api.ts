@@ -4,10 +4,10 @@ import {validate} from "./validation"
 import {handleError} from "./error-handling"
 import {Version} from "./version"
 import {Method, Request, PromiseOrVoid, RequestListener, SimpleResponse} from "./types"
-import {Bad_Request} from "./errors";
+import {Bad_Request, HTTP_Error} from "./errors";
 
 const json_temp = body_parser.json()
-const json_parser = function (req, res, next) {
+const json_parser = function (req: any, res: any, next: any) {
   json_temp(req, res, next)
 }
 
@@ -17,7 +17,7 @@ export type Response_Generator = (request: Request) => Promise<any>
 export type Filter = (request: Request) => Promise_Or_Void
 export type Validator = (data: any) => boolean
 
-export function logErrorToConsole(error) {
+export function logErrorToConsole(error: HTTP_Error) {
   if (!error.stack)
     console.error("Error", error.status, error.message)
   else
@@ -26,11 +26,11 @@ export function logErrorToConsole(error) {
 
 class DefaultRequestListener implements RequestListener {
 
-  onRequest(request: Request, response: SimpleResponse, res): PromiseOrVoid {
+  onRequest(request: Request, response: SimpleResponse, res: any): PromiseOrVoid {
     return
   }
 
-  onError(error, request?: Request): PromiseOrVoid {
+  onError(error: HTTP_Error, request?: Request): PromiseOrVoid {
     logErrorToConsole(error)
     return
   }
@@ -63,8 +63,7 @@ function get_arguments(req: express.Request) {
   return result
 }
 
-function getVersion(req, data): Version {
-  let version: Version = null
+function getVersion(req: any, data: any): Version {
   if (typeof req.params.version == 'string') {
     return new Version(req.params.version)
   }
@@ -77,7 +76,7 @@ function getVersion(req, data): Version {
   throw new Bad_Request("Missing version property.")
 }
 
-function formatRequest(req): Request {
+function formatRequest(req: any): Request {
   const data = get_arguments(req)
 
   const request: Request = {
@@ -93,7 +92,7 @@ function formatRequest(req): Request {
   return request
 }
 
-function logRequest(request: Request, listener: RequestListener, response: SimpleResponse, req) {
+function logRequest(request: Request, listener: RequestListener, response: SimpleResponse, req: any) {
   try {
     listener.onRequest(request, response, req)
   }
@@ -102,12 +101,12 @@ function logRequest(request: Request, listener: RequestListener, response: Simpl
   }
 }
 
-export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: RequestListener) {
+export function create_handler(endpoint: Endpoint_Info, action: any, ajv: any, listener: RequestListener) {
   if (endpoint.validator && !ajv)
     throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.")
 
-  return function (req, res) {
-    let request
+  return function (req: any, res: any) {
+    let request: any
 
     try {
       request = formatRequest(req)
@@ -125,7 +124,7 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
         validate(endpoint.validator, request.data, ajv)
 
       action(request)
-        .then(function (content) {
+        .then(function (content: any) {
             res.send(content)
             logRequest(request, listener, {
               code: 200,
@@ -133,7 +132,7 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
               body: content
             }, req)
           },
-          function (error) {
+          function (error: HTTP_Error) {
             handleError(res, error, listener, request)
             logRequest(request, listener, {
               code: error.status,
@@ -156,7 +155,7 @@ export function create_handler(endpoint: Endpoint_Info, action, ajv, listener: R
   }
 }
 
-function register_http_handler(app: express.Application, path: string, method: Method, handler, middleware) {
+function register_http_handler(app: express.Application, path: string, method: Method, handler: any, middleware: any) {
   switch (method) {
     case Method.get:
       app.get(path, middleware, handler)
@@ -176,7 +175,7 @@ function register_http_handler(app: express.Application, path: string, method: M
   }
 }
 
-export function attach_handler(app: express.Application, endpoint: Endpoint_Info, handler) {
+export function attach_handler(app: express.Application, endpoint: Endpoint_Info, handler: any) {
   let path = endpoint.path
   if (path [0] != '/')
     path = '/' + path
@@ -187,10 +186,10 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 }
 
 export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
-                                preprocessor: Request_Processor = null, ajv = null,
+                                preprocessor: Request_Processor | null = null, ajv = null,
                                 listener: RequestListener = new DefaultRequestListener()) {
   const action = preprocessor
-    ? request => preprocessor(request).then(request => endpoint.action(request))
+    ? (request: any) => preprocessor(request).then(request => endpoint.action(request))
     : endpoint.action
 
   const handler = create_handler(endpoint, action, ajv, listener)
@@ -199,12 +198,13 @@ export function create_endpoint(app: express.Application, endpoint: Endpoint_Inf
 
 export function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info,
                                               endpoint: Optional_Endpoint_Info,
-                                              preprocessor: Request_Processor = null) {
-  create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint), preprocessor)
+                                              preprocessor: Request_Processor | null = null) {
+  const info = Object.assign({}, endpoint_defaults, endpoint) as Endpoint_Info
+  create_endpoint(app, info, preprocessor)
 }
 
 export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                 preprocessor: Request_Processor = null, ajv = null,
+                                 preprocessor: Request_Processor | null = null, ajv = null,
                                  listener: RequestListener = new DefaultRequestListener()) {
   for (let endpoint of endpoints) {
     create_endpoint(app, endpoint, preprocessor, ajv, listener)
@@ -212,7 +212,7 @@ export function create_endpoints(app: express.Application, endpoints: Endpoint_I
 }
 
 export function createEndpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                preprocessor: Request_Processor = null, ajv = null,
+                                preprocessor: Request_Processor | null = null, ajv = null,
                                 listener: RequestListener = new DefaultRequestListener()) {
   return create_endpoints(app, endpoints, preprocessor, ajv, listener)
 }

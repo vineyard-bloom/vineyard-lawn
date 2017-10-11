@@ -13,9 +13,16 @@ export class HTTP_Error extends Error {
   }
 }
 
+export interface Body {
+  key: string
+  data?: any
+}
+
+export type BodyOrString = Body | string
+
 export class Bad_Request extends HTTP_Error {
 
-  constructor(message: string = "Bad Request", bodyOrKey = {}) {
+  constructor(message: string = "Bad Request", bodyOrKey: BodyOrString = {key: ''}) {
     if (typeof bodyOrKey === 'string') {
       super(message, 400)
       this.key = bodyOrKey
@@ -29,7 +36,7 @@ export class Bad_Request extends HTTP_Error {
 
 export class BadRequest extends HTTP_Error {
 
-  constructor(message: string = "Bad Request", bodyOrKey = {}) {
+  constructor(message: string = "Bad Request", bodyOrKey: BodyOrString = {key: ''}) {
     if (typeof bodyOrKey === 'string') {
       super(message, 400)
       this.key = bodyOrKey

@@ -2,9 +2,26 @@ import {Bad_Request} from "./errors"
 
 const characterPattern = /^\^\[(.*?)\][*+]\$$/
 
-const messageFormatters = {
+interface ValidationParams {
+  limit: string
+  pattern: string
+  missingProperty?: string
+  type: string
+  additionalProperty?: string
+}
 
-  maxLength: function (error) {
+interface ValidationError {
+  keyword: string
+  dataPath: string
+  params: ValidationParams
+  message: string
+}
+
+type Validator = (error: ValidationError, data?: any) => Bad_Request | string
+
+const messageFormatters: { [key: string]: Validator } = {
+
+  maxLength: function (error: ValidationError) {
     return new Bad_Request(error.dataPath.substr(1) + ' can not be more than ' + error.params.limit + ' characters.',
       {
         key: 'max-length',
@@ -15,7 +32,7 @@ const messageFormatters = {
       })
   },
 
-  minLength: function (error) {
+  minLength: function (error: ValidationError) {
     return new Bad_Request(error.dataPath.substr(1) + ' must be at least ' + error.params.limit + ' characters.',
       {
         key: 'min-length',
@@ -26,7 +43,7 @@ const messageFormatters = {
       });
   },
 
-  pattern: function (error, data) {
+  pattern: function (error: ValidationError, data: any) {
     const property = error.dataPath.substr(1)
     let match
     if (match = error.params.pattern.match(characterPattern)) {
@@ -49,7 +66,7 @@ const messageFormatters = {
     return property + ' ' + error.message
   },
 
-  required: function (error) {
+  required: function (error: ValidationError) {
     const property = error.params.missingProperty
     const path = error.dataPath
       ? [error.dataPath, property].join('.')
@@ -58,26 +75,26 @@ const messageFormatters = {
     return 'Missing property ' + path
   },
 
-  type: function (error) {
+  type: function (error: ValidationError) {
     const path = error.dataPath.substr(1)
     return 'Property ' + path + ' should be a ' + error.params.type
   },
 
-  additionalProperties: function (error) {
+  additionalProperties: function (error: ValidationError) {
     return 'Unexpected property: ' + error.params.additionalProperty
   }
 }
 
-function formatErrorMessage(error, data): string {
+function formatErrorMessage(error: ValidationError, data: any): string | Bad_Request {
   const formatter = messageFormatters [error.keyword]
   return formatter
     ? formatter(error, data)
     : error.message
 }
 
-export function validate(validator, data: any, ajv) {
+export function validate(validator: any, data: any, ajv: any) {
   if (!validator(data)) {
-    const errors = validator.errors.map(e => formatErrorMessage(e, data))
+    const errors = validator.errors.map((e: ValidationError) => formatErrorMessage(e, data))
     // It seems like ajv should be returning multiple errors but it's only returning the first error.
     // throw new Bad_Request(errors[0], {errors: errors})
     if (typeof errors[0] === 'string') {

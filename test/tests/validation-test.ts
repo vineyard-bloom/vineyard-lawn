@@ -1,23 +1,20 @@
 import * as assert from 'assert'
 import {Server} from "../../source/server";
 import {Method} from "../../source/index";
-import {setErrorLogging} from "../../source/error-handling";
 
 require('source-map-support').install()
 
 const request_original = require('request').defaults({jar: true, json: true})
 
-setErrorLogging(false)
-
-function request(options): Promise<any> {
+function request(options: any): Promise<any> {
   return new Promise(function (resolve, reject) {
-    request_original(options, function (error, response, body) {
+    request_original(options, function (error: Error | undefined, response: any, body: any) {
       const options2 = options
       if (error)
         reject(error)
       else if (response.statusCode != 200) {
-        const error = new Error(response.statusCode + " " + response.statusMessage)
-        error['body'] = response.body
+        const error: any = new Error(response.statusCode + " " + response.statusMessage)
+        error.body = response.body
         reject(error)
       }
       else
@@ -30,7 +27,7 @@ describe('validation test', function () {
   let server
   this.timeout(5000)
 
-  function local_request(method, url, body?) {
+  function local_request(method: string, url: string, body?: any) {
     return request({
       url: "http://localhost:3000/" + url,
       method: method,
@@ -38,7 +35,7 @@ describe('validation test', function () {
     })
   }
 
-  function login(username, password) {
+  function login(username: string, password: string) {
     return local_request('post', 'user/login', {
       username: username,
       password: password
@@ -52,12 +49,12 @@ describe('validation test', function () {
       {
         method: Method.post,
         path: "test",
-        action: request => Promise.resolve(),
+        action: (request: any) => Promise.resolve(),
         validator: validators.test
       },
     ])
 
-    return server.start()
+    return server.start({})
   })
 
   it('missing required', function () {

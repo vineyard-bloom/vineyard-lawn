@@ -14,14 +14,14 @@ export interface Server_Config {
 }
 
 export class Server implements ValidationCompiler {
-  private app
-  private node_server
+  private app: any
+  private node_server: any
   private port: number = 3000
-  private default_preprocessor = null
-  private ajv = null
-  private requestListener: RequestListener
+  private default_preprocessor?: Request_Processor
+  private ajv: any = null
+  private requestListener?: RequestListener
 
-  constructor(default_preprocessor: Request_Processor = null, requestedListener: RequestListener = null) {
+  constructor(default_preprocessor?: Request_Processor, requestedListener?: RequestListener) {
     this.app = express()
     this.default_preprocessor = default_preprocessor
     this.requestListener = requestedListener
@@ -34,10 +34,10 @@ export class Server implements ValidationCompiler {
     }
   }
 
-  compileApiSchema(schema) {
+  compileApiSchema(schema: any) {
     this.checkAjv()
 
-    const result = {}
+    const result: any = {}
     for (let i in schema) {
       const entry = schema[i]
       if (entry.additionalProperties !== true && entry.additionalProperties !== false)
@@ -49,7 +49,7 @@ export class Server implements ValidationCompiler {
     return result
   }
 
-  addApiSchemaHelper(schema) {
+  addApiSchemaHelper(schema: any) {
     this.checkAjv()
     this.ajv.addSchema(schema)
   }
@@ -59,17 +59,17 @@ export class Server implements ValidationCompiler {
     return this.ajv
   }
 
-  createEndpoints(endpoints, preprocessor: Request_Processor = this.default_preprocessor) {
+  createEndpoints(endpoints: any, preprocessor: Request_Processor | undefined = this.default_preprocessor) {
     create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
   }
 
-  add_endpoints(endpoints, preprocessor?: Request_Processor) {
+  add_endpoints(endpoints: any, preprocessor?: Request_Processor) {
     this.createEndpoints(endpoints, preprocessor)
   }
 
   enable_cors() {
     this.app.use(require('cors')({
-      origin: function (origin, callback) {
+      origin: function (origin:any, callback: any) {
         callback(null, true)
       },
       credentials: true
@@ -100,7 +100,7 @@ export class Server implements ValidationCompiler {
   }
 }
 
-export function start_express(app: express.Application, port, ssl: SSLConfig): Promise<any> {
+export function start_express(app: express.Application, port: number, ssl: SSLConfig): Promise<any> {
   return new Promise<any>((resolve, reject) => {
     try {
       if (ssl.enabled) {
@@ -119,7 +119,7 @@ export function start_express(app: express.Application, port, ssl: SSLConfig): P
           key: privateCert,
           cert: publicCert
         }, app)
-          .listen(port, function (err) {
+          .listen(port, function (err: Error) {
             if (err)
               reject("Error starting server (SSL)")
 
@@ -128,7 +128,7 @@ export function start_express(app: express.Application, port, ssl: SSLConfig): P
           })
       }
       else {
-        const server = app.listen(port, function (err) {
+        const server = app.listen(port, function (err: Error) {
           if (err)
             reject("Error starting server")
 

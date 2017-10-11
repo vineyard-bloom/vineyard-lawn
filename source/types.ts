@@ -1,4 +1,4 @@
-export type PromiseOrVoid = Promise<any> | null
+export type PromiseOrVoid = Promise<any> | void
 import {Version} from "./version";
 
 export enum Method {
@@ -13,8 +13,8 @@ export interface Request {
   session: any
   user?: any
   params?: any
-  version: Version
-  startTime?
+  version: Version | null
+  startTime?: any
   original?: any
 }
 
@@ -25,8 +25,8 @@ export interface SimpleResponse {
 }
 
 export interface RequestListener {
-  onRequest(request: Request, response: SimpleResponse, req): PromiseOrVoid
-  onError(error, request?: Request): PromiseOrVoid
+  onRequest(request: Request, response: SimpleResponse, req: any): PromiseOrVoid
+  onError(error: Error, request?: Request): PromiseOrVoid
 }
 
 export interface ValidationCompiler {
