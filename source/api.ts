@@ -1,5 +1,5 @@
 import * as express from "express"
-import * as body_parser from 'body-parser'
+const body_parser = require('body-parser')
 import {validate} from "./validation"
 import {handleError} from "./error-handling"
 import {Version} from "./version"

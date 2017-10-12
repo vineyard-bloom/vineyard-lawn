@@ -14,15 +14,15 @@ export declare class Server implements ValidationCompiler {
     private app;
     private node_server;
     private port;
-    private default_preprocessor;
+    private default_preprocessor?;
     private ajv;
-    private requestListener;
+    private requestListener?;
     constructor(default_preprocessor?: Request_Processor, requestedListener?: RequestListener);
     private checkAjv();
-    compileApiSchema(schema: any): {};
+    compileApiSchema(schema: any): any;
     addApiSchemaHelper(schema: any): void;
     getApiSchema(): any;
-    createEndpoints(endpoints: any, preprocessor?: Request_Processor): void;
+    createEndpoints(endpoints: any, preprocessor?: Request_Processor | undefined): void;
     add_endpoints(endpoints: any, preprocessor?: Request_Processor): void;
     enable_cors(): void;
     start(config: Server_Config): Promise<void>;
@@ -30,4 +30,4 @@ export declare class Server implements ValidationCompiler {
     get_port(): number;
     stop(): Promise<void>;
 }
-export declare function start_express(app: express.Application, port: any, ssl: SSLConfig): Promise<any>;
+export declare function start_express(app: express.Application, port: number, ssl: SSLConfig): Promise<any>;

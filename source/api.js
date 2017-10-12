@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var body_parser = require("body-parser");
+var body_parser = require('body-parser');
 var validation_1 = require("./validation");
 var error_handling_1 = require("./error-handling");
 var version_1 = require("./version");
@@ -38,14 +38,13 @@ function get_arguments(req) {
     return result;
 }
 function getVersion(req, data) {
-    var version = null;
     if (typeof req.params.version == 'string') {
         return new version_1.Version(req.params.version);
     }
     else if (typeof data.version == 'string') {
-        var version_2 = new version_1.Version(data.version);
+        var version = new version_1.Version(data.version);
         delete data.version;
-        return version_2;
+        return version;
     }
     throw new errors_1.Bad_Request("Missing version property.");
 }
@@ -155,7 +154,8 @@ function create_endpoint(app, endpoint, preprocessor, ajv, listener) {
 exports.create_endpoint = create_endpoint;
 function create_endpoint_with_defaults(app, endpoint_defaults, endpoint, preprocessor) {
     if (preprocessor === void 0) { preprocessor = null; }
-    create_endpoint(app, Object.assign({}, endpoint_defaults, endpoint), preprocessor);
+    var info = Object.assign({}, endpoint_defaults, endpoint);
+    create_endpoint(app, info, preprocessor);
 }
 exports.create_endpoint_with_defaults = create_endpoint_with_defaults;
 function create_endpoints(app, endpoints, preprocessor, ajv, listener) {

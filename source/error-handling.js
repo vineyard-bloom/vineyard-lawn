@@ -19,7 +19,7 @@ function handleError(res, error, listener, request) {
     if (request === void 0) { request = null; }
     error.status = error.status || 500;
     try {
-        listener.onError(error, request);
+        listener.onError(error, request || undefined);
     }
     catch (error) {
         console.error('Error while logging http handling error', error);

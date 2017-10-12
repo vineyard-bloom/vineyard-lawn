@@ -18,6 +18,8 @@ export interface Body {
   data?: any
 }
 
+export type HttpError = HTTP_Error
+
 export type BodyOrString = Body | string
 
 export class Bad_Request extends HTTP_Error {

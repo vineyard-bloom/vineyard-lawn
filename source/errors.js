@@ -30,7 +30,7 @@ var Bad_Request = (function (_super) {
     __extends(Bad_Request, _super);
     function Bad_Request(message, bodyOrKey) {
         if (message === void 0) { message = "Bad Request"; }
-        if (bodyOrKey === void 0) { bodyOrKey = {}; }
+        if (bodyOrKey === void 0) { bodyOrKey = { key: '' }; }
         var _this = this;
         if (typeof bodyOrKey === 'string') {
             _this = _super.call(this, message, 400) || this;
@@ -49,7 +49,7 @@ var BadRequest = (function (_super) {
     __extends(BadRequest, _super);
     function BadRequest(message, bodyOrKey) {
         if (message === void 0) { message = "Bad Request"; }
-        if (bodyOrKey === void 0) { bodyOrKey = {}; }
+        if (bodyOrKey === void 0) { bodyOrKey = { key: '' }; }
         var _this = this;
         if (typeof bodyOrKey === 'string') {
             _this = _super.call(this, message, 400) || this;

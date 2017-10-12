@@ -1,4 +1,4 @@
-export declare type PromiseOrVoid = Promise<any> | null;
+export declare type PromiseOrVoid = Promise<any> | void;
 import { Version } from "./version";
 export declare enum Method {
     get = 0,
@@ -11,7 +11,7 @@ export interface Request {
     session: any;
     user?: any;
     params?: any;
-    version: Version;
+    version: Version | null;
     startTime?: any;
     original?: any;
 }
@@ -22,7 +22,7 @@ export interface SimpleResponse {
 }
 export interface RequestListener {
     onRequest(request: Request, response: SimpleResponse, req: any): PromiseOrVoid;
-    onError(error: any, request?: Request): PromiseOrVoid;
+    onError(error: Error, request?: Request): PromiseOrVoid;
 }
 export interface ValidationCompiler {
     compileApiSchema(schema: any): any;

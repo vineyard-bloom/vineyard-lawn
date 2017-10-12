@@ -4,10 +4,7 @@ var express = require("express");
 var api_1 = require("./api");
 var Server = (function () {
     function Server(default_preprocessor, requestedListener) {
-        if (default_preprocessor === void 0) { default_preprocessor = null; }
-        if (requestedListener === void 0) { requestedListener = null; }
         this.port = 3000;
-        this.default_preprocessor = null;
         this.ajv = null;
         this.app = express();
         this.default_preprocessor = default_preprocessor;
@@ -82,11 +79,11 @@ function start_express(app, port, ssl) {
         try {
             if (ssl.enabled) {
                 var https = require('https');
-                var fs_1 = require('fs');
+                var fs = require('fs');
                 var privateCert = void 0, publicCert = void 0;
                 try {
-                    privateCert = fs_1.readFileSync(ssl.privateFile);
-                    publicCert = fs_1.readFileSync(ssl.publicFile);
+                    privateCert = fs.readFileSync(ssl.privateFile);
+                    publicCert = fs.readFileSync(ssl.publicFile);
                 }
                 catch (error) {
                     console.error('Error loading ssl cert file.', error);
