@@ -19,10 +19,9 @@ If an endpoint needs more flexibility it can bypass Lawn and be directly defined
 
 ### TypeScript
 
-    import * as lawn from 'vineyard-lawn'
-    import {Method, HTTP_Error, Bad_Request} from 'vineyard-lawn'
+    import {createEndpoints, Method, BadRequest} from 'vineyard-lawn'
   
-    lawn.create_endpoints(app, [
+    createEndpoints(app, [
       {
         method: Method.get,
         path: "adventure",
@@ -36,7 +35,7 @@ If an endpoint needs more flexibility it can bypass Lawn and be directly defined
         path: "adventure",
         action: request => {
           if (!request.data.page)
-            throw new Bad_Request("Missing 'page' argument.")
+            throw new BadRequest("Missing 'page' argument.")
 
           return Promise.resolve({})
         }
@@ -47,7 +46,7 @@ If an endpoint needs more flexibility it can bypass Lawn and be directly defined
 
     const lawn = require('vineyard-lawn')
   
-    lawn.create_endpoints(app, [
+    lawn.createEndpoints(app, [
       {
         method: lawn.Method.get,
         path: "adventure",
@@ -61,7 +60,7 @@ If an endpoint needs more flexibility it can bypass Lawn and be directly defined
         path: "adventure",
         action: request => {
           if (!request.data.page)
-            throw new Bad_Request("Missing 'page' argument.")
+            throw new BadRequest("Missing 'page' argument.")
           
           const response = {}
           return Promise.resolve(response)
