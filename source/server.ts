@@ -1,5 +1,5 @@
 import * as express from "express"
-import {create_endpoints, Request_Processor} from "./api"
+import {create_endpoints, Request_Processor, Endpoint_Info} from "./api"
 import {RequestListener, ValidationCompiler} from "./types"
 
 export interface SSLConfig {
@@ -8,23 +8,31 @@ export interface SSLConfig {
   privateFile?: string
 }
 
-export interface Server_Config {
+export interface ServerConfig {
   port?: number
   ssl?: SSLConfig
 }
+
+export type Server_Config = ServerConfig
 
 export class Server implements ValidationCompiler {
   private app: any
   private node_server: any
   private port: number = 3000
   private default_preprocessor?: Request_Processor
-  private ajv: any = null
+  private ajv?: any
   private requestListener?: RequestListener
 
   constructor(default_preprocessor?: Request_Processor, requestedListener?: RequestListener) {
     this.app = express()
     this.default_preprocessor = default_preprocessor
     this.requestListener = requestedListener
+
+    // Backwards compatibility
+    const self: any = this
+    self.get_app = this.getApp
+    self.get_port = this.getPort
+    self.enable_cors = this.enableCors
   }
 
   private checkAjv() {
@@ -59,18 +67,18 @@ export class Server implements ValidationCompiler {
     return this.ajv
   }
 
-  createEndpoints(endpoints: any, preprocessor: Request_Processor | undefined = this.default_preprocessor) {
+  createEndpoints(preprocessor: Request_Processor, endpoints: Endpoint_Info[]) {
     create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
   }
 
-  add_endpoints(endpoints: any, preprocessor?: Request_Processor) {
-    this.createEndpoints(endpoints, preprocessor)
+  add_endpoints(endpoints: Endpoint_Info[], preprocessor: Request_Processor) {
+    create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
   }
 
-  enable_cors() {
+  enableCors() {
     this.app.use(require('cors')({
-      origin: function (origin:any, callback: any) {
-        callback(null, true)
+      origin: function (origin: any, callback: any) {
+        callback(undefined, true)
       },
       credentials: true
     }))
@@ -85,11 +93,11 @@ export class Server implements ValidationCompiler {
       })
   }
 
-  get_app() {
+  getApp() {
     return this.app
   }
 
-  get_port(): number {
+  getPort(): number {
     return this.port
   }
 

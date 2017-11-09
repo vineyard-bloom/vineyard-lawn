@@ -1,3 +1,4 @@
+"use strict";
 var request = require('request');
 module.exports = function (options) {
     return new Promise(function (resolve, reject) {

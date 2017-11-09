@@ -1,4 +1,5 @@
 import * as express from "express"
+
 const body_parser = require('body-parser')
 import {validate} from "./validation"
 import {handleError} from "./error-handling"
@@ -34,7 +35,6 @@ class DefaultRequestListener implements RequestListener {
     logErrorToConsole(error)
     return
   }
-
 }
 
 export interface Endpoint_Info {
@@ -82,7 +82,7 @@ function formatRequest(req: any): Request {
   const request: Request = {
     data: data,
     session: req.session,
-    version: null,
+    version: undefined,
     original: req,
     startTime: new Date().getTime()
   }
@@ -103,7 +103,7 @@ function logRequest(request: Request, listener: RequestListener, response: Simpl
 
 export function create_handler(endpoint: Endpoint_Info, action: any, ajv: any, listener: RequestListener) {
   if (endpoint.validator && !ajv)
-    throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.")
+    throw new Error("Lawn.create_handler argument ajv cannot be undefined when endpoints have validators.")
 
   return function (req: any, res: any) {
     let request: any
@@ -113,7 +113,7 @@ export function create_handler(endpoint: Endpoint_Info, action: any, ajv: any, l
     }
     catch (error) {
       console.error('Error in early request handling stages will result in a missing request log.', error)
-      handleError(res, error, listener, null)
+      handleError(res, error, listener, undefined)
       return
     }
 
@@ -142,7 +142,7 @@ export function create_handler(endpoint: Endpoint_Info, action: any, ajv: any, l
           })
     }
     catch (error) {
-      handleError(res, error, listener, null)
+      handleError(res, error, listener, undefined)
       if (!request.version)
         request.version = new Version(0, 0, 'error')
 
@@ -186,7 +186,7 @@ export function attach_handler(app: express.Application, endpoint: Endpoint_Info
 }
 
 export function create_endpoint(app: express.Application, endpoint: Endpoint_Info,
-                                preprocessor: Request_Processor | null = null, ajv = null,
+                                preprocessor?: Request_Processor, ajv?: any,
                                 listener: RequestListener = new DefaultRequestListener()) {
   const action = preprocessor
     ? (request: any) => preprocessor(request).then(request => endpoint.action(request))
@@ -198,13 +198,13 @@ export function create_endpoint(app: express.Application, endpoint: Endpoint_Inf
 
 export function create_endpoint_with_defaults(app: express.Application, endpoint_defaults: Optional_Endpoint_Info,
                                               endpoint: Optional_Endpoint_Info,
-                                              preprocessor: Request_Processor | null = null) {
+                                              preprocessor?: Request_Processor) {
   const info = Object.assign({}, endpoint_defaults, endpoint) as Endpoint_Info
   create_endpoint(app, info, preprocessor)
 }
 
 export function create_endpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                 preprocessor: Request_Processor | null = null, ajv = null,
+                                 preprocessor?: Request_Processor, ajv?: any,
                                  listener: RequestListener = new DefaultRequestListener()) {
   for (let endpoint of endpoints) {
     create_endpoint(app, endpoint, preprocessor, ajv, listener)
@@ -212,7 +212,7 @@ export function create_endpoints(app: express.Application, endpoints: Endpoint_I
 }
 
 export function createEndpoints(app: express.Application, endpoints: Endpoint_Info[],
-                                preprocessor: Request_Processor | null = null, ajv = null,
+                                preprocessor?: Request_Processor, ajv?: any,
                                 listener: RequestListener = new DefaultRequestListener()) {
   return create_endpoints(app, endpoints, preprocessor, ajv, listener)
 }

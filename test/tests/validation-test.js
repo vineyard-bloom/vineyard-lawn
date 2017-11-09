@@ -3,10 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var assert = require("assert");
 var server_1 = require("../../source/server");
 var index_1 = require("../../source/index");
-var error_handling_1 = require("../../source/error-handling");
 require('source-map-support').install();
 var request_original = require('request').defaults({ jar: true, json: true });
-error_handling_1.setErrorLogging(false);
 function request(options) {
     return new Promise(function (resolve, reject) {
         request_original(options, function (error, response, body) {
@@ -15,7 +13,7 @@ function request(options) {
                 reject(error);
             else if (response.statusCode != 200) {
                 var error_1 = new Error(response.statusCode + " " + response.statusMessage);
-                error_1['body'] = response.body;
+                error_1.body = response.body;
                 reject(error_1);
             }
             else
@@ -50,7 +48,7 @@ describe('validation test', function () {
                 validator: validators.test
             },
         ]);
-        return server.start();
+        return server.start({});
     });
     it('missing required', function () {
         return local_request('post', 'test')

@@ -16,7 +16,6 @@ function sendErrorResponse(res, error) {
 }
 exports.sendErrorResponse = sendErrorResponse;
 function handleError(res, error, listener, request) {
-    if (request === void 0) { request = null; }
     error.status = error.status || 500;
     try {
         listener.onError(error, request || undefined);

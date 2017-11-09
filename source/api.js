@@ -53,7 +53,7 @@ function formatRequest(req) {
     var request = {
         data: data,
         session: req.session,
-        version: null,
+        version: undefined,
         original: req,
         startTime: new Date().getTime()
     };
@@ -71,7 +71,7 @@ function logRequest(request, listener, response, req) {
 }
 function create_handler(endpoint, action, ajv, listener) {
     if (endpoint.validator && !ajv)
-        throw new Error("Lawn.create_handler argument ajv cannot be null when endpoints have validators.");
+        throw new Error("Lawn.create_handler argument ajv cannot be undefined when endpoints have validators.");
     return function (req, res) {
         var request;
         try {
@@ -79,7 +79,7 @@ function create_handler(endpoint, action, ajv, listener) {
         }
         catch (error) {
             console.error('Error in early request handling stages will result in a missing request log.', error);
-            error_handling_1.handleError(res, error, listener, null);
+            error_handling_1.handleError(res, error, listener, undefined);
             return;
         }
         try {
@@ -104,7 +104,7 @@ function create_handler(endpoint, action, ajv, listener) {
             });
         }
         catch (error) {
-            error_handling_1.handleError(res, error, listener, null);
+            error_handling_1.handleError(res, error, listener, undefined);
             if (!request.version)
                 request.version = new version_1.Version(0, 0, 'error');
             logRequest(request, listener, {
@@ -142,8 +142,6 @@ function attach_handler(app, endpoint, handler) {
 }
 exports.attach_handler = attach_handler;
 function create_endpoint(app, endpoint, preprocessor, ajv, listener) {
-    if (preprocessor === void 0) { preprocessor = null; }
-    if (ajv === void 0) { ajv = null; }
     if (listener === void 0) { listener = new DefaultRequestListener(); }
     var action = preprocessor
         ? function (request) { return preprocessor(request).then(function (request) { return endpoint.action(request); }); }
@@ -153,14 +151,11 @@ function create_endpoint(app, endpoint, preprocessor, ajv, listener) {
 }
 exports.create_endpoint = create_endpoint;
 function create_endpoint_with_defaults(app, endpoint_defaults, endpoint, preprocessor) {
-    if (preprocessor === void 0) { preprocessor = null; }
     var info = Object.assign({}, endpoint_defaults, endpoint);
     create_endpoint(app, info, preprocessor);
 }
 exports.create_endpoint_with_defaults = create_endpoint_with_defaults;
 function create_endpoints(app, endpoints, preprocessor, ajv, listener) {
-    if (preprocessor === void 0) { preprocessor = null; }
-    if (ajv === void 0) { ajv = null; }
     if (listener === void 0) { listener = new DefaultRequestListener(); }
     for (var _i = 0, endpoints_1 = endpoints; _i < endpoints_1.length; _i++) {
         var endpoint = endpoints_1[_i];
@@ -169,8 +164,6 @@ function create_endpoints(app, endpoints, preprocessor, ajv, listener) {
 }
 exports.create_endpoints = create_endpoints;
 function createEndpoints(app, endpoints, preprocessor, ajv, listener) {
-    if (preprocessor === void 0) { preprocessor = null; }
-    if (ajv === void 0) { ajv = null; }
     if (listener === void 0) { listener = new DefaultRequestListener(); }
     return create_endpoints(app, endpoints, preprocessor, ajv, listener);
 }

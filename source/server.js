@@ -5,10 +5,14 @@ var api_1 = require("./api");
 var Server = (function () {
     function Server(default_preprocessor, requestedListener) {
         this.port = 3000;
-        this.ajv = null;
         this.app = express();
         this.default_preprocessor = default_preprocessor;
         this.requestListener = requestedListener;
+        // Backwards compatibility
+        var self = this;
+        self.get_app = this.getApp;
+        self.get_port = this.getPort;
+        self.enable_cors = this.enableCors;
     }
     Server.prototype.checkAjv = function () {
         if (!this.ajv) {
@@ -35,17 +39,16 @@ var Server = (function () {
         this.checkAjv();
         return this.ajv;
     };
-    Server.prototype.createEndpoints = function (endpoints, preprocessor) {
-        if (preprocessor === void 0) { preprocessor = this.default_preprocessor; }
+    Server.prototype.createEndpoints = function (preprocessor, endpoints) {
         api_1.create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
     };
     Server.prototype.add_endpoints = function (endpoints, preprocessor) {
-        this.createEndpoints(endpoints, preprocessor);
+        api_1.create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
     };
-    Server.prototype.enable_cors = function () {
+    Server.prototype.enableCors = function () {
         this.app.use(require('cors')({
             origin: function (origin, callback) {
-                callback(null, true);
+                callback(undefined, true);
             },
             credentials: true
         }));
@@ -59,10 +62,10 @@ var Server = (function () {
             console.log('Listening on port ' + _this.port + '.');
         });
     };
-    Server.prototype.get_app = function () {
+    Server.prototype.getApp = function () {
         return this.app;
     };
-    Server.prototype.get_port = function () {
+    Server.prototype.getPort = function () {
         return this.port;
     };
     Server.prototype.stop = function () {

@@ -11,7 +11,7 @@ export interface Request {
     session: any;
     user?: any;
     params?: any;
-    version: Version | null;
+    version?: Version;
     startTime?: any;
     original?: any;
 }

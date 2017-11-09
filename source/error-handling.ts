@@ -18,7 +18,7 @@ export function sendErrorResponse(res: any, error: HTTP_Error) {
   res.status(error.status).send(body)
 }
 
-export function handleError(res: any, error: HTTP_Error, listener: RequestListener, request: Request | null = null) {
+export function handleError(res: any, error: HTTP_Error, listener: RequestListener, request?: Request) {
   error.status = error.status || 500
 
   try {
