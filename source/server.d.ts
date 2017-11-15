@@ -1,3 +1,4 @@
+/// <reference types="express" />
 import * as express from "express";
 import { Request_Processor, Endpoint_Info } from "./api";
 import { RequestListener, ValidationCompiler } from "./types";
