@@ -12,7 +12,7 @@ export interface Request {
     session: any;
     user?: any;
     params?: any;
-    version?: Version;
+    version?: Version | undefined;
     startTime?: any;
     original?: any;
 }
