@@ -1,6 +1,6 @@
 import * as express from "express"
-import {create_endpoints, Request_Processor, Endpoint_Info} from "./api"
-import {RequestListener, ValidationCompiler} from "./types"
+import {create_endpoints} from "./api"
+import {Endpoint_Info, RequestListener, Request_Processor, ValidationCompiler} from "./types"
 
 export interface SSLConfig {
   enabled?: boolean
@@ -38,7 +38,7 @@ export class Server implements ValidationCompiler {
   private checkAjv() {
     if (!this.ajv) {
       const Ajv = require('ajv')
-      this.ajv = new Ajv()
+      this.ajv = new Ajv({allErrors: true})
     }
   }
 

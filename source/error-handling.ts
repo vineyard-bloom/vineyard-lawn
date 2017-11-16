@@ -5,16 +5,10 @@ export function sendErrorResponse(res: any, error: HTTP_Error) {
   const message = error.message = error.status == 500 ? "Server Error" : error.message
   res.statusMessage = message
   const body: any = {
-    error: {
-      code: error.status,
-      message: message
-    }
+    message: error.message,
+    errors: error.body.errors
   }
 
-  if (error.body && (typeof error.body != 'object' || Object.keys(error.body).length > 0))
-    body.additional = error.body
-
-  error.body = body
   res.status(error.status).send(body)
 }
 

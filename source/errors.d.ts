@@ -2,11 +2,13 @@ export declare class HTTP_Error extends Error {
     status: number;
     body: any;
     key: string;
+    message: string;
     constructor(message?: string, status?: number, body?: {});
 }
 export interface Body {
     key: string;
     data?: any;
+    errors?: any[];
 }
 export declare type HttpError = HTTP_Error;
 export declare type BodyOrString = Body | string;

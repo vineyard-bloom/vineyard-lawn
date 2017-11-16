@@ -4,6 +4,7 @@ export class HTTP_Error extends Error {
   status: number
   body: any
   key: string
+  message: string
 
   constructor(message: string = "Server Error", status: number = 500, body = {}) {
     super(message)
@@ -16,6 +17,7 @@ export class HTTP_Error extends Error {
 export interface Body {
   key: string
   data?: any
+  errors?: any[]
 }
 
 export type HttpError = HTTP_Error

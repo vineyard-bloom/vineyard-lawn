@@ -1,28 +1,8 @@
 /// <reference types="express" />
 import * as express from "express";
-import { Method, Request, RequestListener } from "./types";
+import { Endpoint_Info, Optional_Endpoint_Info, RequestListener, Request_Processor } from "./types";
 import { HTTP_Error } from "./errors";
-export declare type Promise_Or_Void = Promise<void> | void;
-export declare type Request_Processor = (request: Request) => Promise<Request>;
-export declare type Response_Generator = (request: Request) => Promise<any>;
-export declare type Filter = (request: Request) => Promise_Or_Void;
-export declare type Validator = (data: any) => boolean;
 export declare function logErrorToConsole(error: HTTP_Error): void;
-export interface Endpoint_Info {
-    method: Method;
-    path: string;
-    action: Response_Generator;
-    middleware?: any[];
-    filter?: Filter;
-    validator?: Validator;
-}
-export interface Optional_Endpoint_Info {
-    method?: Method;
-    path?: string;
-    action?: Response_Generator;
-    middleware?: any[];
-    filter?: Filter;
-}
 export declare function create_handler(endpoint: Endpoint_Info, action: any, ajv: any, listener: RequestListener): (req: any, res: any) => void;
 export declare function attach_handler(app: express.Application, endpoint: Endpoint_Info, handler: any): void;
 export declare function create_endpoint(app: express.Application, endpoint: Endpoint_Info, preprocessor?: Request_Processor, ajv?: any, listener?: RequestListener): void;

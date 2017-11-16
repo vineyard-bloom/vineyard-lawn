@@ -1,7 +1,6 @@
 /// <reference types="express" />
 import * as express from "express";
-import { Request_Processor, Endpoint_Info } from "./api";
-import { RequestListener, ValidationCompiler } from "./types";
+import { Endpoint_Info, RequestListener, Request_Processor, ValidationCompiler } from "./types";
 export interface SSLConfig {
     enabled?: boolean;
     publicFile?: string;
