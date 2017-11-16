@@ -1,5 +1,6 @@
 export declare type PromiseOrVoid = Promise<any> | void;
 import { Version } from "./version";
+import { ValidateFunction } from "ajv";
 export declare enum Method {
     get = 0,
     post = 1,
@@ -11,10 +12,14 @@ export interface Request {
     session: any;
     user?: any;
     params?: any;
-    version?: Version;
+    version?: Version | undefined;
     startTime?: any;
     original?: any;
 }
+export declare type Filter = (request: Request) => Promise_Or_Void;
+export declare type Promise_Or_Void = Promise<void> | void;
+export declare type Request_Processor = (request: Request) => Promise<Request>;
+export declare type Response_Generator = (request: Request) => Promise<any>;
 export interface SimpleResponse {
     code: number;
     message: string;
@@ -26,4 +31,19 @@ export interface RequestListener {
 }
 export interface ValidationCompiler {
     compileApiSchema(schema: any): any;
+}
+export interface Endpoint_Info {
+    method: Method;
+    path: string;
+    action: Response_Generator;
+    middleware?: any[];
+    filter?: Filter;
+    validator?: ValidateFunction;
+}
+export interface Optional_Endpoint_Info {
+    method?: Method;
+    path?: string;
+    action?: Response_Generator;
+    middleware?: any[];
+    filter?: Filter;
 }

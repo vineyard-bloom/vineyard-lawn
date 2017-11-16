@@ -4,7 +4,18 @@ const body_parser = require('body-parser')
 import {validate} from "./validation"
 import {handleError} from "./error-handling"
 import {Version} from "./version"
-import {Method, Request, PromiseOrVoid, RequestListener, SimpleResponse} from "./types"
+import {
+  Endpoint_Info, 
+  Filter,
+  Method, 
+  Optional_Endpoint_Info,
+  PromiseOrVoid, 
+  Request, 
+  RequestListener, 
+  Request_Processor, 
+  Response_Generator,
+  SimpleResponse
+} from "./types"
 import {Bad_Request, HTTP_Error} from "./errors";
 
 const json_temp = body_parser.json()
@@ -12,11 +23,6 @@ const json_parser = function (req: any, res: any, next: any) {
   json_temp(req, res, next)
 }
 
-export type Promise_Or_Void = Promise<void> | void
-export type Request_Processor = (request: Request) => Promise<Request>
-export type Response_Generator = (request: Request) => Promise<any>
-export type Filter = (request: Request) => Promise_Or_Void
-export type Validator = (data: any) => boolean
 
 export function logErrorToConsole(error: HTTP_Error) {
   if (!error.stack)
@@ -37,23 +43,6 @@ class DefaultRequestListener implements RequestListener {
   }
 }
 
-export interface Endpoint_Info {
-  method: Method
-  path: string
-  action: Response_Generator
-  middleware?: any[]
-  filter?: Filter
-  validator?: Validator
-}
-
-export interface Optional_Endpoint_Info {
-  method?: Method
-  path?: string
-  action?: Response_Generator
-  middleware?: any[]
-  filter?: Filter
-}
-
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function get_arguments(req: express.Request) {
   const result = req.body || {}
@@ -63,17 +52,16 @@ function get_arguments(req: express.Request) {
   return result
 }
 
-function getVersion(req: any, data: any): Version {
-  if (typeof req.params.version == 'string') {
+function getVersion(req: any, data: any): Version | undefined {
+  if (typeof req.params.version === 'string') {
     return new Version(req.params.version)
   }
-  else if (typeof data.version == 'string') {
+  else if (typeof data.version === 'string') {
     const version = new Version(data.version)
     delete data.version
     return version
   }
-
-  throw new Bad_Request("Missing version property.")
+  return undefined
 }
 
 function formatRequest(req: any): Request {

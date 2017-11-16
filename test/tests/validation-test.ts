@@ -45,7 +45,7 @@ describe('validation test', function () {
   before(function () {
     server = new Server()
     const validators = server.compileApiSchema(require('../source/api.json'))
-    server.createEndpoints([
+    server.createEndpoints(Promise.resolve, [
       {
         method: Method.post,
         path: "test",
@@ -60,24 +60,22 @@ describe('validation test', function () {
   it('missing required', function () {
     return local_request('post', 'test')
       .then(result => {
-        assert(false, 'Should have thrown an error.')
+        assert(false, 'Should have thrown an error')
       })
       .catch(error => {
         assert.equal(1, error.body.errors.length)
-        assert.equal('Missing property "weapon".', error.body.errors[0])
+        assert.equal('Missing property "weapon"', error.body.errors[0])
       })
   })
 
   it('wrong property type', function () {
-    return local_request('post', 'test', {
-      weapon: 640
-    })
+    return local_request('post', 'test', { weapon: 640 })
       .then(result => {
-        assert(false, 'Should have thrown an error.')
+        assert(false, 'Should have thrown an error')
       })
       .catch(error => {
         assert.equal(1, error.body.errors.length)
-        assert.equal('Property "weapon" should be a string.', error.body.errors[0])
+        assert.equal('Property "weapon" should be a string', error.body.errors[0])
       })
   })
 
