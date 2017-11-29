@@ -5,7 +5,6 @@ var validation_1 = require("./validation");
 var error_handling_1 = require("./error-handling");
 var version_1 = require("./version");
 var types_1 = require("./types");
-var errors_1 = require("./errors");
 var json_temp = body_parser.json();
 var json_parser = function (req, res, next) {
     json_temp(req, res, next);
@@ -38,15 +37,15 @@ function get_arguments(req) {
     return result;
 }
 function getVersion(req, data) {
-    if (typeof req.params.version == 'string') {
+    if (typeof req.params.version === 'string') {
         return new version_1.Version(req.params.version);
     }
-    else if (typeof data.version == 'string') {
+    else if (typeof data.version === 'string') {
         var version = new version_1.Version(data.version);
         delete data.version;
         return version;
     }
-    throw new errors_1.Bad_Request("Missing version property.");
+    return undefined;
 }
 function formatRequest(req) {
     var data = get_arguments(req);

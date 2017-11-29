@@ -40,7 +40,7 @@ describe('validation test', function () {
     before(function () {
         server = new server_1.Server();
         var validators = server.compileApiSchema(require('../source/api.json'));
-        server.createEndpoints([
+        server.createEndpoints(Promise.resolve, [
             {
                 method: index_1.Method.post,
                 path: "test",
@@ -53,23 +53,21 @@ describe('validation test', function () {
     it('missing required', function () {
         return local_request('post', 'test')
             .then(function (result) {
-            assert(false, 'Should have thrown an error.');
+            assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
             assert.equal(1, error.body.errors.length);
-            assert.equal('Missing property "weapon".', error.body.errors[0]);
+            assert.equal('Missing property "weapon"', error.body.errors[0]);
         });
     });
     it('wrong property type', function () {
-        return local_request('post', 'test', {
-            weapon: 640
-        })
+        return local_request('post', 'test', { weapon: 640 })
             .then(function (result) {
-            assert(false, 'Should have thrown an error.');
+            assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
             assert.equal(1, error.body.errors.length);
-            assert.equal('Property "weapon" should be a string.', error.body.errors[0]);
+            assert.equal('Property "weapon" should be a string', error.body.errors[0]);
         });
     });
 });

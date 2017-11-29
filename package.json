@@ -5,7 +5,8 @@
   "main": "source/index.js",
   "types": "source/index.d.ts",
   "scripts": {
-    "test": "mocha test/tests/*.js"
+    "test": "mocha test/tests/*.js",
+    "doc": "node test/generate-docs"
   },
   "repository": "git@github.com:vineyard-bloom/vineyard-lawn.git",
   "author": "Christopher W. Johnson",
@@ -24,6 +25,7 @@
     "mocha": "^4.0.1",
     "request": "^2.81.0",
     "source-map-support": "^0.4.14",
-    "typescript": "^2.1.6"
+    "typescript": "^2.1.6",
+    "vineyard-docs": "vineyard-bloom/vineyard-docs#1.0.0-beta"
   }
 }

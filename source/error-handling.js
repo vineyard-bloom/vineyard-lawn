@@ -4,14 +4,9 @@ function sendErrorResponse(res, error) {
     var message = error.message = error.status == 500 ? "Server Error" : error.message;
     res.statusMessage = message;
     var body = {
-        error: {
-            code: error.status,
-            message: message
-        }
+        message: error.message,
+        errors: error.body.errors
     };
-    if (error.body && (typeof error.body != 'object' || Object.keys(error.body).length > 0))
-        body.additional = error.body;
-    error.body = body;
     res.status(error.status).send(body);
 }
 exports.sendErrorResponse = sendErrorResponse;

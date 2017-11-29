@@ -45,11 +45,11 @@ var messageFormatters = {
         var path = error.dataPath
             ? [error.dataPath, property].join('.')
             : property;
-        return 'Missing property ' + path;
+        return 'Missing property "' + path + '"';
     },
     type: function (error) {
         var path = error.dataPath.substr(1);
-        return 'Property ' + path + ' should be a ' + error.params.type;
+        return 'Property "' + path + '" should be a ' + error.params.type;
     },
     additionalProperties: function (error) {
         return 'Unexpected property: ' + error.params.additionalProperty;
@@ -65,13 +65,12 @@ function validate(validator, data, ajv) {
     if (!validator(data)) {
         var errors = validator.errors.map(function (e) { return formatErrorMessage(e, data); });
         // It seems like ajv should be returning multiple errors but it's only returning the first error.
-        // throw new Bad_Request(errors[0], {errors: errors})
-        if (typeof errors[0] === 'string') {
-            throw new errors_1.Bad_Request(errors[0]);
-        }
-        else {
-            throw errors[0];
-        }
+        throw new errors_1.Bad_Request('Bad Request', { errors: errors, key: '' });
+        // if (typeof errors[0] === 'string') {
+        //   throw new Bad_Request(errors[0])
+        // } else {
+        //   throw errors[0]
+        // }
     }
 }
 exports.validate = validate;
