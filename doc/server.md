@@ -1,8 +1,18 @@
-# Vineyard Lawn Server
+# Vineyard Lawn - Server Class
 
 Lawn provides an optional Server class that wraps Lawn's core routing functions and streamlines spinning up an API server.
 
-## `Server` class
+## Example usage
+
+import * as lawn from 'vineyard-lawn'
+const config = require('../config/config.json')
+
+const server = new lawn.Server()
+server.createEndpoints(...)
+server.start(config.api)
+
+## `Server` Class API
+
 ### Constructor
 
 Parameters
@@ -15,7 +25,7 @@ Returns `Server`
 ### Functions
 
 #### `addApiSchemaHelper`
-Adds an API validation schema to the Server's ajv instance
+Adds an API validation schema to the Server's ajv instance.
 
 Parameters
 
@@ -43,7 +53,7 @@ Parameters
 Returns `void`
 
 #### `enableCors`
-Enables wildcard CORS for this server
+Enables wildcard CORS for this server.
 
 Returns `void`
 
@@ -53,17 +63,17 @@ Returns the Server's ajv instance.
 Returns `any`
 
 #### `getApp`
-Returns the internal Express app
+Gets the Server's internal Express app.
 
 Returns `any`
 
 #### `getPort`
-Gets the listening HTTP port
+Gets the listening HTTP port.
 
 Returns `number`
 
 #### `start`
-Starts listening for HTTP requests
+Starts listening for HTTP requests.
 
 Parameters
 
@@ -72,7 +82,7 @@ Parameters
 Returns `Promise`
 
 #### `stop`
-Stops the server
+Stops the server.
 
 Returns `Promise`
 
