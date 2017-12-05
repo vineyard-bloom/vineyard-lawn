@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var body_parser = require('body-parser');
-var validation_1 = require("./validation");
-var error_handling_1 = require("./error-handling");
-var version_1 = require("./version");
-var types_1 = require("./types");
-var json_temp = body_parser.json();
-var json_parser = function (req, res, next) {
+const body_parser = require('body-parser');
+const validation_1 = require("./validation");
+const error_handling_1 = require("./error-handling");
+const version_1 = require("./version");
+const types_1 = require("./types");
+const json_temp = body_parser.json();
+const json_parser = function (req, res, next) {
     json_temp(req, res, next);
 };
 function logErrorToConsole(error) {
@@ -16,22 +16,19 @@ function logErrorToConsole(error) {
         console.error("Error", error.status, error.stack);
 }
 exports.logErrorToConsole = logErrorToConsole;
-var DefaultRequestListener = (function () {
-    function DefaultRequestListener() {
-    }
-    DefaultRequestListener.prototype.onRequest = function (request, response, res) {
+class DefaultRequestListener {
+    onRequest(request, response, res) {
         return;
-    };
-    DefaultRequestListener.prototype.onError = function (error, request) {
+    }
+    onError(error, request) {
         logErrorToConsole(error);
         return;
-    };
-    return DefaultRequestListener;
-}());
+    }
+}
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function get_arguments(req) {
-    var result = req.body || {};
-    for (var i in req.query) {
+    const result = req.body || {};
+    for (let i in req.query) {
         result[i] = req.query[i];
     }
     return result;
@@ -41,15 +38,15 @@ function getVersion(req, data) {
         return new version_1.Version(req.params.version);
     }
     else if (typeof data.version === 'string') {
-        var version = new version_1.Version(data.version);
+        const version = new version_1.Version(data.version);
         delete data.version;
         return version;
     }
     return undefined;
 }
 function formatRequest(req) {
-    var data = get_arguments(req);
-    var request = {
+    const data = get_arguments(req);
+    const request = {
         data: data,
         session: req.session,
         version: undefined,
@@ -72,7 +69,7 @@ function create_handler(endpoint, action, ajv, listener) {
     if (endpoint.validator && !ajv)
         throw new Error("Lawn.create_handler argument ajv cannot be undefined when endpoints have validators.");
     return function (req, res) {
-        var request;
+        let request;
         try {
             request = formatRequest(req);
         }
@@ -132,38 +129,34 @@ function register_http_handler(app, path, method, handler, middleware) {
     }
 }
 function attach_handler(app, endpoint, handler) {
-    var path = endpoint.path;
+    let path = endpoint.path;
     if (path[0] != '/')
         path = '/' + path;
-    var middleware = endpoint.middleware || [];
+    const middleware = endpoint.middleware || [];
     register_http_handler(app, path, endpoint.method, handler, middleware);
     register_http_handler(app, '/:version' + path, endpoint.method, handler, middleware);
 }
 exports.attach_handler = attach_handler;
-function create_endpoint(app, endpoint, preprocessor, ajv, listener) {
-    if (listener === void 0) { listener = new DefaultRequestListener(); }
-    var action = preprocessor
-        ? function (request) { return preprocessor(request).then(function (request) { return endpoint.action(request); }); }
+function create_endpoint(app, endpoint, preprocessor, ajv, listener = new DefaultRequestListener()) {
+    const action = preprocessor
+        ? (request) => preprocessor(request).then(request => endpoint.action(request))
         : endpoint.action;
-    var handler = create_handler(endpoint, action, ajv, listener);
+    const handler = create_handler(endpoint, action, ajv, listener);
     attach_handler(app, endpoint, handler);
 }
 exports.create_endpoint = create_endpoint;
 function create_endpoint_with_defaults(app, endpoint_defaults, endpoint, preprocessor) {
-    var info = Object.assign({}, endpoint_defaults, endpoint);
+    const info = Object.assign({}, endpoint_defaults, endpoint);
     create_endpoint(app, info, preprocessor);
 }
 exports.create_endpoint_with_defaults = create_endpoint_with_defaults;
-function create_endpoints(app, endpoints, preprocessor, ajv, listener) {
-    if (listener === void 0) { listener = new DefaultRequestListener(); }
-    for (var _i = 0, endpoints_1 = endpoints; _i < endpoints_1.length; _i++) {
-        var endpoint = endpoints_1[_i];
+function create_endpoints(app, endpoints, preprocessor, ajv, listener = new DefaultRequestListener()) {
+    for (let endpoint of endpoints) {
         create_endpoint(app, endpoint, preprocessor, ajv, listener);
     }
 }
 exports.create_endpoints = create_endpoints;
-function createEndpoints(app, endpoints, preprocessor, ajv, listener) {
-    if (listener === void 0) { listener = new DefaultRequestListener(); }
+function createEndpoints(app, endpoints, preprocessor, ajv, listener = new DefaultRequestListener()) {
     return create_endpoints(app, endpoints, preprocessor, ajv, listener);
 }
 exports.createEndpoints = createEndpoints;

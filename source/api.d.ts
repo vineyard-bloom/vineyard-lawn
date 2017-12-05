@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import * as express from "express";
 import { Endpoint_Info, Optional_Endpoint_Info, RequestListener, Request_Processor } from "./types";
 import { HTTP_Error } from "./errors";

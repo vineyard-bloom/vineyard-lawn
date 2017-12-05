@@ -1,121 +1,117 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
-var api_1 = require("./api");
-var Server = (function () {
+const express = require("express");
+const api_1 = require("./api");
+class Server {
     /**
      * @param defaultPreprocessor  Deprecated
      * @param requestListener   Callback fired any time a request is received
      */
-    function Server(defaultPreprocessor, requestListener) {
-        var _this = this;
+    constructor(defaultPreprocessor, requestListener) {
         this.port = 3000;
         this.app = express();
         this.default_preprocessor = defaultPreprocessor;
         this.requestListener = requestListener;
         // Backwards compatibility
-        var self = this;
+        const self = this;
         self.get_app = this.getApp;
         self.get_port = this.getPort;
         self.enable_cors = this.enableCors;
-        self.add_endpoints = function (endpoints, preprocessor) {
-            api_1.create_endpoints(_this.app, endpoints, preprocessor, _this.ajv, _this.requestListener);
+        self.add_endpoints = (endpoints, preprocessor) => {
+            api_1.create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
         };
     }
-    Server.prototype.checkAjv = function () {
+    checkAjv() {
         if (!this.ajv) {
-            var Ajv = require('ajv');
+            const Ajv = require('ajv');
             this.ajv = new Ajv({ allErrors: true });
         }
-    };
+    }
     /**
      * Compiles an API vaidation schema using ajv.
      */
-    Server.prototype.compileApiSchema = function (schema) {
+    compileApiSchema(schema) {
         this.checkAjv();
-        var result = {};
-        for (var i in schema) {
-            var entry = schema[i];
+        const result = {};
+        for (let i in schema) {
+            const entry = schema[i];
             if (entry.additionalProperties !== true && entry.additionalProperties !== false)
                 entry.additionalProperties = false;
             result[i] = this.ajv.compile(schema[i]);
         }
         return result;
-    };
+    }
     /**
      * Adds an API validation schema to the Server's ajv instance.
      */
-    Server.prototype.addApiSchemaHelper = function (schema) {
+    addApiSchemaHelper(schema) {
         this.checkAjv();
         this.ajv.addSchema(schema);
-    };
+    }
     /**
      * Returns the Server's ajv instance.
      */
-    Server.prototype.getApiSchema = function () {
+    getApiSchema() {
         this.checkAjv();
         return this.ajv;
-    };
+    }
     /**
      * Main function to create one or more endpoints.
      */
-    Server.prototype.createEndpoints = function (preprocessor, endpoints) {
+    createEndpoints(preprocessor, endpoints) {
         api_1.create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
-    };
+    }
     /**
      * Enables wildcard CORS for this server.
      */
-    Server.prototype.enableCors = function () {
+    enableCors() {
         this.app.use(require('cors')({
             origin: function (origin, callback) {
                 callback(undefined, true);
             },
             credentials: true
         }));
-    };
+    }
     /**
      * Starts listening for HTTP requests.
      */
-    Server.prototype.start = function (config) {
-        var _this = this;
+    start(config) {
         this.port = (config && config.port) || 3000;
         return start_express(this.app, this.port, config.ssl || {})
-            .then(function (server) {
-            _this.node_server = server;
-            console.log('Listening on port ' + _this.port + '.');
+            .then(server => {
+            this.node_server = server;
+            console.log('Listening on port ' + this.port + '.');
         });
-    };
+    }
     /**
      * Gets the Server's internal Express app.
      */
-    Server.prototype.getApp = function () {
+    getApp() {
         return this.app;
-    };
+    }
     /**
      * Gets the listening HTTP port.
      */
-    Server.prototype.getPort = function () {
+    getPort() {
         return this.port;
-    };
+    }
     /**
      * Stops the server.
      */
-    Server.prototype.stop = function () {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this.node_server.close(function () { return resolve(); });
+    stop() {
+        return new Promise((resolve, reject) => {
+            this.node_server.close(() => resolve());
         });
-    };
-    return Server;
-}());
+    }
+}
 exports.Server = Server;
 function start_express(app, port, ssl) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         try {
             if (ssl.enabled) {
-                var https = require('https');
-                var fs = require('fs');
-                var privateCert = void 0, publicCert = void 0;
+                const https = require('https');
+                const fs = require('fs');
+                let privateCert, publicCert;
                 try {
                     privateCert = fs.readFileSync(ssl.privateFile);
                     publicCert = fs.readFileSync(ssl.publicFile);
@@ -124,7 +120,7 @@ function start_express(app, port, ssl) {
                     console.error('Error loading ssl cert file.', error);
                     reject(error);
                 }
-                var server_1 = https.createServer({
+                const server = https.createServer({
                     key: privateCert,
                     cert: publicCert
                 }, app)
@@ -132,15 +128,15 @@ function start_express(app, port, ssl) {
                     if (err)
                         reject("Error starting server (SSL)");
                     console.log('API is listening on port ' + port + ' (SSL)');
-                    resolve(server_1);
+                    resolve(server);
                 });
             }
             else {
-                var server_2 = app.listen(port, function (err) {
+                const server = app.listen(port, function (err) {
                     if (err)
                         reject("Error starting server");
                     console.log('API is listening on port ' + port);
-                    resolve(server_2);
+                    resolve(server);
                 });
             }
         }
