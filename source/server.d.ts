@@ -1,5 +1,5 @@
 import * as express from "express";
-import { Endpoint_Info, RequestListener, Request_Processor, ValidationCompiler } from "./types";
+import { EndpointInfo, RequestListener, RequestProcessor, ValidationCompiler } from "./types";
 export interface SSLConfig {
     enabled?: boolean;
     publicFile?: string;
@@ -21,7 +21,7 @@ export declare class Server implements ValidationCompiler {
      * @param defaultPreprocessor  Deprecated
      * @param requestListener   Callback fired any time a request is received
      */
-    constructor(defaultPreprocessor?: Request_Processor, requestListener?: RequestListener);
+    constructor(defaultPreprocessor?: RequestProcessor, requestListener?: RequestListener);
     private checkAjv();
     /**
      * Compiles an API vaidation schema using ajv.
@@ -37,8 +37,13 @@ export declare class Server implements ValidationCompiler {
     getApiSchema(): any;
     /**
      * Main function to create one or more endpoints.
+     *
+     * @param preprocessor  Function to call before each endpoint handler
+     *
+     * @param endpoints  Array of endpoint definitions
+     *
      */
-    createEndpoints(preprocessor: Request_Processor, endpoints: Endpoint_Info[]): void;
+    createEndpoints(preprocessor: RequestProcessor, endpoints: EndpointInfo[]): void;
     /**
      * Enables wildcard CORS for this server.
      */

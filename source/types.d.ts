@@ -1,4 +1,3 @@
-export declare type PromiseOrVoid = Promise<any> | void;
 import { Version } from "./version";
 import { ValidateFunction } from "ajv";
 export declare enum Method {
@@ -12,14 +11,13 @@ export interface Request {
     session: any;
     user?: any;
     params?: any;
-    version?: Version | undefined;
+    version?: Version;
     startTime?: any;
     original?: any;
 }
-export declare type Filter = (request: Request) => Promise_Or_Void;
-export declare type Promise_Or_Void = Promise<void> | void;
-export declare type Request_Processor = (request: Request) => Promise<Request>;
-export declare type Response_Generator = (request: Request) => Promise<any>;
+export declare type PromiseOrVoid = Promise<void> | void;
+export declare type RequestProcessor = (request: Request) => Promise<Request>;
+export declare type ResponseGenerator = (request: Request) => Promise<any>;
 export interface SimpleResponse {
     code: number;
     message: string;
@@ -32,18 +30,15 @@ export interface RequestListener {
 export interface ValidationCompiler {
     compileApiSchema(schema: any): any;
 }
-export interface Endpoint_Info {
+export interface EndpointInfo {
+    /** HTTP Method */
     method: Method;
+    /** Relative endpoint path */
     path: string;
-    action: Response_Generator;
+    /** Request handler function */
+    action: ResponseGenerator;
+    /** Array of Express middleware to use just for this endpoint */
     middleware?: any[];
-    filter?: Filter;
+    /** AJV schema validator function */
     validator?: ValidateFunction;
-}
-export interface Optional_Endpoint_Info {
-    method?: Method;
-    path?: string;
-    action?: Response_Generator;
-    middleware?: any[];
-    filter?: Filter;
 }

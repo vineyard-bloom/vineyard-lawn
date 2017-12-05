@@ -24,16 +24,35 @@ Lawn provides an optional Server class that wraps Lawn's core routing functions 
         }
       },
     ])
-   
+
+## Endpoint Types
+
+### `enum` Method
+* delete
+* get
+* post
+* put
+
+### `interface` EndpointInfo
+
+#### Properties
+
+* action `ResponseGenerator` Request handler function
+* method `Method` HTTP Method
+* middleware `any[]` Array of Express middleware to use just for this endpoint
+* path `string` Relative endpoint path
+* validator `ValidateFunction` AJV schema validator function
 
 ## Endpoint Functions
 
-### `createEndpoints`
+### createEndpoints
 
 Parameters
 
-*  preprocessor `Request_Processor` 
-*  endpoints `Endpoint_Info[]` 
+*  preprocessor `RequestProcessor` Function to call before each endpoint handler
+
+*  endpoints `EndpointInfo[]` Array of endpoint definitions
+
+
 
 Returns `void`
-

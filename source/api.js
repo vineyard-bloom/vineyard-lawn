@@ -26,7 +26,7 @@ class DefaultRequestListener {
     }
 }
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
-function get_arguments(req) {
+function getArguments(req) {
     const result = req.body || {};
     for (let i in req.query) {
         result[i] = req.query[i];
@@ -45,7 +45,7 @@ function getVersion(req, data) {
     return undefined;
 }
 function formatRequest(req) {
-    const data = get_arguments(req);
+    const data = getArguments(req);
     const request = {
         data: data,
         session: req.session,
@@ -65,7 +65,7 @@ function logRequest(request, listener, response, req) {
         console.error('Error while logging request', error);
     }
 }
-function create_handler(endpoint, action, ajv, listener) {
+function createHandler(endpoint, action, ajv, listener) {
     if (endpoint.validator && !ajv)
         throw new Error("Lawn.create_handler argument ajv cannot be undefined when endpoints have validators.");
     return function (req, res) {
@@ -111,8 +111,8 @@ function create_handler(endpoint, action, ajv, listener) {
         }
     };
 }
-exports.create_handler = create_handler;
-function register_http_handler(app, path, method, handler, middleware) {
+exports.createHandler = createHandler;
+function registerHttpHandler(app, path, method, handler, middleware) {
     switch (method) {
         case types_1.Method.get:
             app.get(path, middleware, handler);
@@ -128,36 +128,44 @@ function register_http_handler(app, path, method, handler, middleware) {
             break;
     }
 }
-function attach_handler(app, endpoint, handler) {
+function attachHandler(app, endpoint, handler) {
     let path = endpoint.path;
     if (path[0] != '/')
         path = '/' + path;
     const middleware = endpoint.middleware || [];
-    register_http_handler(app, path, endpoint.method, handler, middleware);
-    register_http_handler(app, '/:version' + path, endpoint.method, handler, middleware);
+    registerHttpHandler(app, path, endpoint.method, handler, middleware);
+    registerHttpHandler(app, '/:version' + path, endpoint.method, handler, middleware);
 }
-exports.attach_handler = attach_handler;
-function create_endpoint(app, endpoint, preprocessor, ajv, listener = new DefaultRequestListener()) {
+exports.attachHandler = attachHandler;
+function createEndpoint(app, endpoint, preprocessor, ajv, listener = new DefaultRequestListener()) {
     const action = preprocessor
         ? (request) => preprocessor(request).then(request => endpoint.action(request))
         : endpoint.action;
-    const handler = create_handler(endpoint, action, ajv, listener);
-    attach_handler(app, endpoint, handler);
+    const handler = createHandler(endpoint, action, ajv, listener);
+    attachHandler(app, endpoint, handler);
 }
-exports.create_endpoint = create_endpoint;
-function create_endpoint_with_defaults(app, endpoint_defaults, endpoint, preprocessor) {
-    const info = Object.assign({}, endpoint_defaults, endpoint);
-    create_endpoint(app, info, preprocessor);
-}
-exports.create_endpoint_with_defaults = create_endpoint_with_defaults;
-function create_endpoints(app, endpoints, preprocessor, ajv, listener = new DefaultRequestListener()) {
+exports.createEndpoint = createEndpoint;
+/**
+ *
+ * @param app  Express app object to attach the new endpoints
+ *
+ * @param endpoints  Array of endpoint definitions to create
+ *
+ * @param preprocessor  A function to be run before each endpoint handler
+ *
+ * @param ajv  Ajv object used for schema validation
+ *
+ * @param listener  Callback fired after each request in the endpoints is handled
+ *
+ */
+function createEndpoints(app, endpoints, preprocessor, ajv, listener = new DefaultRequestListener()) {
     for (let endpoint of endpoints) {
-        create_endpoint(app, endpoint, preprocessor, ajv, listener);
+        createEndpoint(app, endpoint, preprocessor, ajv, listener);
     }
 }
-exports.create_endpoints = create_endpoints;
-function createEndpoints(app, endpoints, preprocessor, ajv, listener = new DefaultRequestListener()) {
-    return create_endpoints(app, endpoints, preprocessor, ajv, listener);
-}
 exports.createEndpoints = createEndpoints;
+module.exports.create_endpoint = createEndpoint;
+module.exports.create_handler = createHandler;
+module.exports.attach_handler = attachHandler;
+module.exports.create_endpoints = createEndpoints;
 //# sourceMappingURL=api.js.map

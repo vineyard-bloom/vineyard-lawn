@@ -13,18 +13,18 @@ server.start(config.api)
 
 ## `Server` Class API
 
-### Constructor
+#### Constructor
 
 Parameters
 
-* *(optional)* defaultPreprocessor `Request_Processor` 
+* *(optional)* defaultPreprocessor `RequestProcessor` 
 * *(optional)* requestListener `RequestListener` 
 
 Returns `Server`
 
-### Functions
+#### Functions
 
-#### `addApiSchemaHelper`
+##### `addApiSchemaHelper`
 Adds an API validation schema to the Server's ajv instance.
 
 Parameters
@@ -33,7 +33,7 @@ Parameters
 
 Returns `void`
 
-#### `compileApiSchema`
+##### `compileApiSchema`
 Compiles an API vaidation schema using ajv.
 
 Parameters
@@ -42,37 +42,40 @@ Parameters
 
 Returns `any`
 
-#### `createEndpoints`
+##### `createEndpoints`
 Main function to create one or more endpoints.
 
 Parameters
 
-*  preprocessor `Request_Processor` 
-*  endpoints `Endpoint_Info[]` 
+*  preprocessor `RequestProcessor` Function to call before each endpoint handler
+
+*  endpoints `EndpointInfo[]` Array of endpoint definitions
+
+
 
 Returns `void`
 
-#### `enableCors`
+##### `enableCors`
 Enables wildcard CORS for this server.
 
 Returns `void`
 
-#### `getApiSchema`
+##### `getApiSchema`
 Returns the Server's ajv instance.
 
 Returns `any`
 
-#### `getApp`
+##### `getApp`
 Gets the Server's internal Express app.
 
 Returns `any`
 
-#### `getPort`
+##### `getPort`
 Gets the listening HTTP port.
 
 Returns `number`
 
-#### `start`
+##### `start`
 Starts listening for HTTP requests.
 
 Parameters
@@ -81,7 +84,7 @@ Parameters
 
 Returns `Promise`
 
-#### `stop`
+##### `stop`
 Stops the server.
 
 Returns `Promise`

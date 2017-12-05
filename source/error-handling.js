@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function sendErrorResponse(res, error) {
-    const message = error.message = error.status == 500 ? "Server Error" : error.message;
+    var message = error.message = error.status == 500 ? "Server Error" : error.message;
     res.statusMessage = message;
-    const body = {
+    var body = {
         message: error.message,
         errors: error.body.errors
     };

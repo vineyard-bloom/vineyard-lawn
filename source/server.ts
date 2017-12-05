@@ -1,6 +1,6 @@
 import * as express from "express"
-import {create_endpoints} from "./api"
-import {Endpoint_Info, RequestListener, Request_Processor, ValidationCompiler} from "./types"
+import {createEndpoints} from "./api"
+import {EndpointInfo, RequestListener, RequestProcessor, ValidationCompiler} from "./types"
 
 export interface SSLConfig {
   enabled?: boolean
@@ -19,7 +19,7 @@ export class Server implements ValidationCompiler {
   private app: any
   private node_server: any
   private port: number = 3000
-  private default_preprocessor?: Request_Processor
+  private default_preprocessor?: RequestProcessor
   private ajv?: any
   private requestListener?: RequestListener
 
@@ -27,7 +27,7 @@ export class Server implements ValidationCompiler {
    * @param defaultPreprocessor  Deprecated
    * @param requestListener   Callback fired any time a request is received
    */
-  constructor(defaultPreprocessor?: Request_Processor, requestListener?: RequestListener) {
+  constructor(defaultPreprocessor?: RequestProcessor, requestListener?: RequestListener) {
     this.app = express()
     this.default_preprocessor = defaultPreprocessor
     this.requestListener = requestListener
@@ -37,8 +37,8 @@ export class Server implements ValidationCompiler {
     self.get_app = this.getApp
     self.get_port = this.getPort
     self.enable_cors = this.enableCors
-    self.add_endpoints = (endpoints: Endpoint_Info[], preprocessor: Request_Processor) => {
-      create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
+    self.add_endpoints = (endpoints: EndpointInfo[], preprocessor: RequestProcessor) => {
+      createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
     }
   }
 
@@ -85,9 +85,14 @@ export class Server implements ValidationCompiler {
 
   /**
    * Main function to create one or more endpoints.
+   *
+   * @param preprocessor  Function to call before each endpoint handler
+   *
+   * @param endpoints  Array of endpoint definitions
+   *
    */
-  createEndpoints(preprocessor: Request_Processor, endpoints: Endpoint_Info[]) {
-    create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
+  createEndpoints(preprocessor: RequestProcessor, endpoints: EndpointInfo[]) {
+    createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
   }
 
   /**

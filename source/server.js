@@ -18,7 +18,7 @@ class Server {
         self.get_port = this.getPort;
         self.enable_cors = this.enableCors;
         self.add_endpoints = (endpoints, preprocessor) => {
-            api_1.create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
+            api_1.createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
         };
     }
     checkAjv() {
@@ -57,9 +57,14 @@ class Server {
     }
     /**
      * Main function to create one or more endpoints.
+     *
+     * @param preprocessor  Function to call before each endpoint handler
+     *
+     * @param endpoints  Array of endpoint definitions
+     *
      */
     createEndpoints(preprocessor, endpoints) {
-        api_1.create_endpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
+        api_1.createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
     }
     /**
      * Enables wildcard CORS for this server.
