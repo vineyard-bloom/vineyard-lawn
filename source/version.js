@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var errors_1 = require("./errors");
-var advancedPattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/;
+var advancedPattern = /^(\d+)(?:\.(\d+)(?:\.([a-z]+))?)?$/;
 var simplePattern = /^v(\d+)$/;
 var defaultPlatform = 'none';
 var Version = (function () {
@@ -9,7 +9,8 @@ var Version = (function () {
         if (minor === void 0) { minor = 0; }
         if (platform === void 0) { platform = defaultPlatform; }
         if (typeof majorOrString === 'string') {
-            this.createFromString(majorOrString);
+            console.error('Initializing a Version object with a string is deprecated.  Use one of the static Version.createFromString methods instead.');
+            this.createFromStringOld(majorOrString);
         }
         else {
             this.major = majorOrString;
@@ -17,7 +18,19 @@ var Version = (function () {
             this.platform = platform;
         }
     }
-    Version.prototype.createFromString = function (text) {
+    Version.createFromString = function (text) {
+        var match = text.match(advancedPattern);
+        if (!match)
+            return undefined;
+        return new Version(parseInt(match[1]), parseInt(match[2]), match[3] ? match[3] : defaultPlatform);
+    };
+    Version.createFromSimpleString = function (text) {
+        var match = text.match(simplePattern);
+        if (!match)
+            return undefined;
+        return new Version(parseInt(match[1]));
+    };
+    Version.prototype.createFromStringOld = function (text) {
         var match = text.match(advancedPattern);
         if (!match)
             throw new errors_1.Bad_Request('Invalid version format: ' + text);
@@ -26,12 +39,6 @@ var Version = (function () {
         this.platform = match[3]
             ? match[3]
             : defaultPlatform;
-    };
-    Version.createFromSimpleString = function (text) {
-        var match = text.match(simplePattern);
-        if (!match)
-            throw new errors_1.Bad_Request('Invalid version format: ' + text);
-        return new Version(parseInt(match[1]));
     };
     Version.prototype.equals = function (version) {
         return this.major == version.major && this.minor == version.minor;

@@ -2,8 +2,9 @@ export declare class Version {
     major: number;
     minor: number;
     platform: string;
-    private createFromString(text);
-    static createFromSimpleString(text: string): Version;
+    static createFromString(text: string): Version | undefined;
+    static createFromSimpleString(text: string): Version | undefined;
+    private createFromStringOld(text);
     constructor(majorOrString: number | string, minor?: number, platform?: string);
     equals(version: Version): boolean;
     toString(): string;

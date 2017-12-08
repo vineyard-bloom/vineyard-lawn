@@ -1,6 +1,6 @@
 import {Bad_Request} from "./errors";
 
-const advancedPattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/
+const advancedPattern = /^(\d+)(?:\.(\d+)(?:\.([a-z]+))?)?$/
 const simplePattern = /^v(\d+)$/
 
 const defaultPlatform = 'none'
@@ -10,7 +10,26 @@ export class Version {
   minor: number
   platform: string
 
-  private createFromString(text: string) {
+  static createFromString(text: string): Version | undefined {
+    const match = text.match(advancedPattern)
+    if (!match)
+      return undefined
+
+    return new Version(
+      parseInt(match[1]),
+      parseInt(match [2]),
+      match[3] ? match[3] : defaultPlatform)
+  }
+
+  static createFromSimpleString(text: string): Version | undefined {
+    const match = text.match(simplePattern)
+    if (!match)
+      return undefined
+
+    return new Version(parseInt(match[1]))
+  }
+
+  private createFromStringOld(text: string) {
     const match = text.match(advancedPattern)
     if (!match)
       throw new Bad_Request('Invalid version format: ' + text)
@@ -22,17 +41,10 @@ export class Version {
       : defaultPlatform
   }
 
-  static createFromSimpleString(text: string): Version {
-    const match = text.match(simplePattern)
-    if (!match)
-      throw new Bad_Request('Invalid version format: ' + text)
-
-    return new Version(parseInt(match[1]))
-  }
-
   constructor(majorOrString: number | string, minor: number = 0, platform: string = defaultPlatform) {
     if (typeof majorOrString === 'string') {
-      this.createFromString(majorOrString)
+      console.error('Initializing a Version object with a string is deprecated.  Use one of the static Version.createFromString methods instead.')
+      this.createFromStringOld(majorOrString)
     }
     else {
       this.major = majorOrString

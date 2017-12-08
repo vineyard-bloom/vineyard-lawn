@@ -120,13 +120,13 @@ describe('versioning test', function () {
     }
     it('simple version', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var versionPreprocessor, validators, result;
+            var validators, versionPreprocessor, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         server = new server_1.Server();
-                        versionPreprocessor = new version_preprocessor_1.VersionPreprocessor([new version_1.Version(1)]);
                         validators = server.compileApiSchema(require('../source/api.json'));
+                        versionPreprocessor = new version_preprocessor_1.VersionPreprocessor([new version_1.Version(1)]);
                         server.createEndpoints(function (r) { return versionPreprocessor.simpleVersion(r); }, [
                             {
                                 method: index_1.Method.post,
@@ -146,6 +146,26 @@ describe('versioning test', function () {
                 }
             });
         });
+    });
+});
+describe('versioning-test', function () {
+    it('version parsing', function () {
+        {
+            var version = new version_1.Version(1);
+            assert.equal(version.major, 1);
+            assert.equal(version.minor, 0);
+            assert.equal(version.platform, 'none');
+        }
+        {
+            var version = new version_1.Version('1');
+            assert.equal(version.major, 1);
+        }
+        {
+            var version = new version_1.Version('1.2.beta');
+            assert.equal(version.major, 1);
+            assert.equal(version.minor, 2);
+            assert.equal(version.platform, 'beta');
+        }
     });
 });
 //# sourceMappingURL=validation-test.js.map

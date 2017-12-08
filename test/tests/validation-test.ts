@@ -97,8 +97,8 @@ describe('versioning test', function () {
 
   it('simple version', async function () {
     server = new Server()
-    const versionPreprocessor = new VersionPreprocessor([new Version(1)])
     const validators = server.compileApiSchema(require('../source/api.json'))
+    const versionPreprocessor = new VersionPreprocessor([new Version(1)])
     server.createEndpoints(r => versionPreprocessor.simpleVersion(r), [
       {
         method: Method.post,
@@ -111,5 +111,29 @@ describe('versioning test', function () {
 
     const result = await local_request('post', 'v1/test')
     assert.equal(result.message, 'success')
+  })
+})
+
+describe('versioning-test', function () {
+
+  it('version parsing', function () {
+    {
+      const version = new Version(1)
+      assert.equal(version.major, 1)
+      assert.equal(version.minor, 0)
+      assert.equal(version.platform, 'none')
+    }
+
+    {
+      const version = new Version('1')
+      assert.equal(version.major, 1)
+    }
+
+    {
+      const version = new Version('1.2.beta')
+      assert.equal(version.major, 1)
+      assert.equal(version.minor, 2)
+      assert.equal(version.platform, 'beta')
+    }
   })
 })

@@ -1,11 +1,13 @@
 import { Version } from "./version";
 import { Request } from "./types";
+export declare function getRequestVersionString(req: any, data: any): string | undefined;
+export declare function prepareRequestVersionText(req: any, data: any): string;
+export declare function getVersion(req: any, data: any): Version | undefined;
+export declare function getSimpleVersion(req: any, data: any): Version | undefined;
+export declare function checkVersion(request: Request, versions: Version[]): void;
 export declare class VersionPreprocessor {
-    versions: Version[];
+    private versions;
     constructor(versions: Version[]);
-    static getVersion(req: any, data: any): Version | undefined;
-    static getSimpleVersion(req: any, data: any): Version | undefined;
-    checkVersion(request: Request): void;
     common(request: Request): Promise<Request>;
     simpleVersion(request: Request): Promise<Request>;
 }
