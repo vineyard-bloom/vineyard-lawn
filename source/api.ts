@@ -48,18 +48,6 @@ function getArguments(req: express.Request) {
   return result
 }
 
-function getVersion(req: any, data: any): Version | undefined {
-  if (typeof req.params.version === 'string') {
-    return new Version(req.params.version)
-  }
-  else if (typeof data.version === 'string') {
-    const version = new Version(data.version)
-    delete data.version
-    return version
-  }
-  return undefined
-}
-
 function formatRequest(req: any): Request {
   const data = getArguments(req)
 
@@ -102,8 +90,6 @@ export function createHandler(endpoint: EndpointInfo, action: any, ajv: any, lis
     }
 
     try {
-      request.version = getVersion(req, request.data)
-
       if (endpoint.validator)
         validate(endpoint.validator, request.data, ajv)
 

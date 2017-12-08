@@ -1,8 +1,10 @@
+import {VersionPreprocessor} from "../../source/version-preprocessor";
+
+require('source-map-support').install()
 import * as assert from 'assert'
 import {Server} from "../../source/server";
 import {Method} from "../../source/index";
-
-require('source-map-support').install()
+import {Version} from "../../source/version";
 
 const request_original = require('request').defaults({jar: true, json: true})
 
@@ -69,7 +71,7 @@ describe('validation test', function () {
   })
 
   it('wrong property type', function () {
-    return local_request('post', 'test', { weapon: 640 })
+    return local_request('post', 'test', {weapon: 640})
       .then(result => {
         assert(false, 'Should have thrown an error')
       })
@@ -79,4 +81,35 @@ describe('validation test', function () {
       })
   })
 
+})
+
+describe('versioning test', function () {
+  let server
+  this.timeout(9000)
+
+  function local_request(method: string, url: string, body?: any) {
+    return request({
+      url: "http://localhost:3000/" + url,
+      method: method,
+      body: body
+    })
+  }
+
+  it('simple version', async function () {
+    server = new Server()
+    const versionPreprocessor = new VersionPreprocessor([new Version(1)])
+    const validators = server.compileApiSchema(require('../source/api.json'))
+    server.createEndpoints(r => versionPreprocessor.simpleVersion(r), [
+      {
+        method: Method.post,
+        path: "test",
+        action: (request: any) => Promise.resolve({message: 'success'}),
+        validator: validators.none
+      },
+    ])
+    await server.start({})
+
+    const result = await local_request('post', 'v1/test')
+    assert.equal(result.message, 'success')
+  })
 })

@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var errors_1 = require("./errors");
-var pattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/;
+var advancedPattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/;
+var simplePattern = /^v(\d+)$/;
 var defaultPlatform = 'none';
 var Version = (function () {
     function Version(majorOrString, minor, platform) {
@@ -17,7 +18,7 @@ var Version = (function () {
         }
     }
     Version.prototype.createFromString = function (text) {
-        var match = text.match(pattern);
+        var match = text.match(advancedPattern);
         if (!match)
             throw new errors_1.Bad_Request('Invalid version format: ' + text);
         this.major = parseInt(match[1]);
@@ -25,6 +26,12 @@ var Version = (function () {
         this.platform = match[3]
             ? match[3]
             : defaultPlatform;
+    };
+    Version.createFromSimpleString = function (text) {
+        var match = text.match(simplePattern);
+        if (!match)
+            throw new errors_1.Bad_Request('Invalid version format: ' + text);
+        return new Version(parseInt(match[1]));
     };
     Version.prototype.equals = function (version) {
         return this.major == version.major && this.minor == version.minor;

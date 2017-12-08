@@ -1,5 +1,8 @@
 import {Bad_Request} from "./errors";
-const pattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/
+
+const advancedPattern = /^(\d+)\.(\d+)(\.[a-z]+)?$/
+const simplePattern = /^v(\d+)$/
+
 const defaultPlatform = 'none'
 
 export class Version {
@@ -8,7 +11,7 @@ export class Version {
   platform: string
 
   private createFromString(text: string) {
-    const match = text.match(pattern)
+    const match = text.match(advancedPattern)
     if (!match)
       throw new Bad_Request('Invalid version format: ' + text)
 
@@ -17,6 +20,14 @@ export class Version {
     this.platform = match[3]
       ? match[3]
       : defaultPlatform
+  }
+
+  static createFromSimpleString(text: string): Version {
+    const match = text.match(simplePattern)
+    if (!match)
+      throw new Bad_Request('Invalid version format: ' + text)
+
+    return new Version(parseInt(match[1]))
   }
 
   constructor(majorOrString: number | string, minor: number = 0, platform: string = defaultPlatform) {

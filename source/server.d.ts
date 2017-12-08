@@ -1,3 +1,4 @@
+/// <reference types="express" />
 import * as express from "express";
 import { EndpointInfo, RequestListener, RequestProcessor, ValidationCompiler } from "./types";
 export interface SSLConfig {
