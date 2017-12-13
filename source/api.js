@@ -111,6 +111,9 @@ function registerHttpHandler(app, path, method, handler, middleware) {
         case types_1.Method.post:
             app.post(path, [json_parser].concat(middleware), handler);
             break;
+        case types_1.Method.patch:
+            app.patch(path, [json_parser].concat(middleware), handler);
+            break;
         case types_1.Method.put:
             app.put(path, [json_parser].concat(middleware), handler);
             break;

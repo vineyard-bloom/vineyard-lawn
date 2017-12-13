@@ -2,9 +2,10 @@ import { Version } from "./version";
 import { ValidateFunction } from "ajv";
 export declare enum Method {
     get = 0,
-    post = 1,
-    put = 2,
-    delete = 3,
+    patch = 1,
+    post = 2,
+    put = 3,
+    delete = 4,
 }
 export interface Request {
     data: any;

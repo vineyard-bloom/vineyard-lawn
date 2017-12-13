@@ -3,6 +3,7 @@ import {ValidateFunction} from "ajv"
 
 export enum Method {
   get,
+  patch,
   post,
   put,
   delete
@@ -30,6 +31,7 @@ export interface SimpleResponse {
 
 export interface RequestListener {
   onRequest(request: Request, response: SimpleResponse, req: any): PromiseOrVoid
+
   onError(error: Error, request?: Request): PromiseOrVoid
 }
 

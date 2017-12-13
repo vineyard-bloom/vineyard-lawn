@@ -135,6 +135,10 @@ function registerHttpHandler(app: express.Application, path: string, method: Met
       app.post(path, [json_parser].concat(middleware), handler)
       break;
 
+    case Method.patch:
+      app.patch(path, [json_parser].concat(middleware), handler)
+      break;
+
     case Method.put:
       app.put(path, [json_parser].concat(middleware), handler)
       break;
