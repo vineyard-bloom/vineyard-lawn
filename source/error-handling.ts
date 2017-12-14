@@ -4,6 +4,7 @@ import {HTTP_Error} from "./errors";
 export function sendErrorResponse(res: any, error: HTTP_Error) {
   const message = error.message = error.status == 500 ? "Server Error" : error.message
   res.statusMessage = message
+  error.body = error.body || {}
   const body: any = {
     message: error.message,
     errors: error.body.errors

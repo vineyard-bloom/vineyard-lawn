@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function sendErrorResponse(res, error) {
     var message = error.message = error.status == 500 ? "Server Error" : error.message;
     res.statusMessage = message;
+    error.body = error.body || {};
     var body = {
         message: error.message,
         errors: error.body.errors
