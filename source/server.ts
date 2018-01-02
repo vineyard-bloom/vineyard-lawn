@@ -89,7 +89,6 @@ export class Server implements ValidationCompiler {
     return start_express(this.app, this.port, config.ssl || {})
       .then(server => {
         this.node_server = server
-        console.log('Listening on port ' + this.port + '.')
       })
   }
 
