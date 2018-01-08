@@ -5,4 +5,5 @@ export declare class WebClient {
     get(path: string, params?: any): any;
     post(path: string, data?: any): any;
     put(path: string, data: any): any;
+    patch(path: string, data: any): any;
 }

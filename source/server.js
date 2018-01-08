@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var api_1 = require("./api");
-var Server = (function () {
+var Server = /** @class */ (function () {
     /**
      * @param defaultPreprocessor  Deprecated
      * @param requestListener   Callback fired any time a request is received

@@ -4,6 +4,7 @@ export declare class HTTP_Error extends Error {
     key: string;
     message: string;
     constructor(message?: string, status?: number, body?: {});
+    toString(): string;
 }
 export interface Body {
     key: string;

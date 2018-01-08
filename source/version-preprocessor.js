@@ -35,7 +35,7 @@ function checkVersion(request, versions) {
         throw new errors_1.Bad_Request("Unsupported version number");
 }
 exports.checkVersion = checkVersion;
-var VersionPreprocessor = (function () {
+var VersionPreprocessor = /** @class */ (function () {
     function VersionPreprocessor(versions) {
         if (!versions.length)
             throw new Error('VersionPreprocessor.versions array cannot be empty.');
@@ -54,4 +54,9 @@ var VersionPreprocessor = (function () {
     return VersionPreprocessor;
 }());
 exports.VersionPreprocessor = VersionPreprocessor;
+function createVersionPreprocessor(versions) {
+    var helper = new VersionPreprocessor(versions);
+    return function (request) { return helper.simpleVersion(request); };
+}
+exports.createVersionPreprocessor = createVersionPreprocessor;
 //# sourceMappingURL=version-preprocessor.js.map

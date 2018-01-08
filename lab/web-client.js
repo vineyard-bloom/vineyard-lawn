@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var promiseRequest = require('./request-promise');
-var WebClient = (function () {
+var WebClient = /** @class */ (function () {
     function WebClient(url) {
         this.url = url;
     }
@@ -32,6 +32,9 @@ var WebClient = (function () {
     };
     WebClient.prototype.put = function (path, data) {
         return this.request('put', path, null, data);
+    };
+    WebClient.prototype.patch = function (path, data) {
+        return this.request('patch', path, null, data);
     };
     return WebClient;
 }());

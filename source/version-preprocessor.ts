@@ -1,6 +1,6 @@
 import {Version} from "./version"
 import {Bad_Request} from "./errors"
-import {Request} from "./types"
+import {Request, RequestProcessor} from "./types"
 
 export function getRequestVersionString(req: any, data: any): string | undefined {
   return req.params.version
@@ -59,4 +59,9 @@ export class VersionPreprocessor {
     checkVersion(request, this.versions)
     return Promise.resolve(request)
   }
+}
+
+export function createVersionPreprocessor(versions: Version[]): RequestProcessor {
+  const helper = new VersionPreprocessor(versions)
+  return (request: Request) => helper.simpleVersion(request)
 }

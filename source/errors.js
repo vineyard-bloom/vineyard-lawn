@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var HTTP_Error = (function (_super) {
+var HTTP_Error = /** @class */ (function (_super) {
     __extends(HTTP_Error, _super);
     function HTTP_Error(message, status, body) {
         if (message === void 0) { message = "Server Error"; }
@@ -23,10 +23,13 @@ var HTTP_Error = (function (_super) {
         _this.body = body;
         return _this;
     }
+    HTTP_Error.prototype.toString = function () {
+        return _super.prototype.toString.call(this) + ' ' + JSON.stringify(this.body);
+    };
     return HTTP_Error;
 }(Error));
 exports.HTTP_Error = HTTP_Error;
-var Bad_Request = (function (_super) {
+var Bad_Request = /** @class */ (function (_super) {
     __extends(Bad_Request, _super);
     function Bad_Request(message, bodyOrKey) {
         if (message === void 0) { message = "Bad Request"; }
@@ -45,7 +48,7 @@ var Bad_Request = (function (_super) {
     return Bad_Request;
 }(HTTP_Error));
 exports.Bad_Request = Bad_Request;
-var BadRequest = (function (_super) {
+var BadRequest = /** @class */ (function (_super) {
     __extends(BadRequest, _super);
     function BadRequest(message, bodyOrKey) {
         if (message === void 0) { message = "Bad Request"; }
@@ -64,7 +67,7 @@ var BadRequest = (function (_super) {
     return BadRequest;
 }(HTTP_Error));
 exports.BadRequest = BadRequest;
-var Needs_Login = (function (_super) {
+var Needs_Login = /** @class */ (function (_super) {
     __extends(Needs_Login, _super);
     function Needs_Login(message) {
         if (message === void 0) { message = "This request requires a logged in user."; }
@@ -73,7 +76,7 @@ var Needs_Login = (function (_super) {
     return Needs_Login;
 }(HTTP_Error));
 exports.Needs_Login = Needs_Login;
-var Unauthorized = (function (_super) {
+var Unauthorized = /** @class */ (function (_super) {
     __extends(Unauthorized, _super);
     function Unauthorized(message) {
         if (message === void 0) { message = "You are not authorized to perform this request."; }

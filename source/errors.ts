@@ -12,6 +12,10 @@ export class HTTP_Error extends Error {
     this.message = message // super(message) doesn't seem to be working.
     this.body = body
   }
+
+  toString() {
+    return super.toString() + ' ' + JSON.stringify(this.body)
+  }
 }
 
 export interface Body {

@@ -4,7 +4,7 @@ var errors_1 = require("./errors");
 var advancedPattern = /^(\d+)(?:\.(\d+)(?:\.([a-z]+))?)?$/;
 var simplePattern = /^v(\d+)$/;
 var defaultPlatform = 'none';
-var Version = (function () {
+var Version = /** @class */ (function () {
     function Version(majorOrString, minor, platform) {
         if (minor === void 0) { minor = 0; }
         if (platform === void 0) { platform = defaultPlatform; }

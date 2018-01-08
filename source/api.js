@@ -16,7 +16,7 @@ function logErrorToConsole(error) {
         console.error("Error", error.status, error.stack);
 }
 exports.logErrorToConsole = logErrorToConsole;
-var DefaultRequestListener = (function () {
+var DefaultRequestListener = /** @class */ (function () {
     function DefaultRequestListener() {
     }
     DefaultRequestListener.prototype.onRequest = function (request, response, res) {

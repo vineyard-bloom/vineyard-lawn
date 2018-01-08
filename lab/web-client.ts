@@ -40,4 +40,8 @@ export class WebClient {
     return this.request('put', path, null, data)
   }
 
+  patch(path: string, data: any) {
+    return this.request('patch', path, null, data)
+  }
+
 }
