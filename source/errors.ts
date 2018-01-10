@@ -1,6 +1,6 @@
 // Lawn will handle any type of thrown errors, but also provides these helper Error types.
 
-export class HTTP_Error extends Error {
+export class HttpError extends Error {
   status: number
   body: any
   key: string
@@ -24,7 +24,17 @@ export interface Body {
   errors?: any[]
 }
 
-export type HttpError = HTTP_Error
+export class HTTP_Error extends HttpError {
+  constructor(message: string = "Server Error", status: number = 500, body = {}) {
+    super(message, status, body)
+  }
+}
+
+export class HTTPError extends HttpError {
+  constructor(message: string = "Server Error", status: number = 500, body = {}) {
+    super(message, status, body)
+  }
+}
 
 export type BodyOrString = Body | string
 

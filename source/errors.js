@@ -11,9 +11,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var HTTP_Error = /** @class */ (function (_super) {
-    __extends(HTTP_Error, _super);
-    function HTTP_Error(message, status, body) {
+var HttpError = /** @class */ (function (_super) {
+    __extends(HttpError, _super);
+    function HttpError(message, status, body) {
         if (message === void 0) { message = "Server Error"; }
         if (status === void 0) { status = 500; }
         if (body === void 0) { body = {}; }
@@ -23,12 +23,34 @@ var HTTP_Error = /** @class */ (function (_super) {
         _this.body = body;
         return _this;
     }
-    HTTP_Error.prototype.toString = function () {
+    HttpError.prototype.toString = function () {
         return _super.prototype.toString.call(this) + ' ' + JSON.stringify(this.body);
     };
-    return HTTP_Error;
+    return HttpError;
 }(Error));
+exports.HttpError = HttpError;
+var HTTP_Error = /** @class */ (function (_super) {
+    __extends(HTTP_Error, _super);
+    function HTTP_Error(message, status, body) {
+        if (message === void 0) { message = "Server Error"; }
+        if (status === void 0) { status = 500; }
+        if (body === void 0) { body = {}; }
+        return _super.call(this, message, status, body) || this;
+    }
+    return HTTP_Error;
+}(HttpError));
 exports.HTTP_Error = HTTP_Error;
+var HTTPError = /** @class */ (function (_super) {
+    __extends(HTTPError, _super);
+    function HTTPError(message, status, body) {
+        if (message === void 0) { message = "Server Error"; }
+        if (status === void 0) { status = 500; }
+        if (body === void 0) { body = {}; }
+        return _super.call(this, message, status, body) || this;
+    }
+    return HTTPError;
+}(HttpError));
+exports.HTTPError = HTTPError;
 var Bad_Request = /** @class */ (function (_super) {
     __extends(Bad_Request, _super);
     function Bad_Request(message, bodyOrKey) {

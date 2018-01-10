@@ -1,4 +1,4 @@
-export declare class HTTP_Error extends Error {
+export declare class HttpError extends Error {
     status: number;
     body: any;
     key: string;
@@ -11,7 +11,12 @@ export interface Body {
     data?: any;
     errors?: any[];
 }
-export declare type HttpError = HTTP_Error;
+export declare class HTTP_Error extends HttpError {
+    constructor(message?: string, status?: number, body?: {});
+}
+export declare class HTTPError extends HttpError {
+    constructor(message?: string, status?: number, body?: {});
+}
 export declare type BodyOrString = Body | string;
 export declare class Bad_Request extends HTTP_Error {
     constructor(message?: string, bodyOrKey?: BodyOrString);
