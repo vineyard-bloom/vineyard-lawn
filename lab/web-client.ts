@@ -1,10 +1,13 @@
 const promiseRequest = require('./request-promise')
+const request =  require('request')
 
 export class WebClient {
   url: string
+  jar: any
 
   constructor(url: string) {
     this.url = url;
+    this.jar = request.jar()
   }
 
   private request(method: string, path: string, params: any, data: any) {
@@ -14,7 +17,7 @@ export class WebClient {
       qs: params,
       body: data,
       json: true,
-      jar: true,
+      jar: this.jar,
     })
   }
 

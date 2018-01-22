@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var promiseRequest = require('./request-promise');
+var request = require('request');
 var WebClient = /** @class */ (function () {
     function WebClient(url) {
         this.url = url;
+        this.jar = request.jar();
     }
     WebClient.prototype.request = function (method, path, params, data) {
         return promiseRequest({
@@ -12,7 +14,7 @@ var WebClient = /** @class */ (function () {
             qs: params,
             body: data,
             json: true,
-            jar: true,
+            jar: this.jar,
         });
     };
     WebClient.prototype.get = function (path, params) {

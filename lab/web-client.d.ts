@@ -1,5 +1,6 @@
 export declare class WebClient {
     url: string;
+    jar: any;
     constructor(url: string);
     private request(method, path, params, data);
     get(path: string, params?: any): any;
