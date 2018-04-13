@@ -25,7 +25,7 @@ export class WebClient {
     let paramString = ''
 
     if (params && Object.keys(params).length > 0) {
-      const array = []
+      const array: string[] = []
       for (let i in params) {
         array.push(i + '=' + params[i])
       }
