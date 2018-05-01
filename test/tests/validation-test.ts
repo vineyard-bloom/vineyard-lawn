@@ -7,6 +7,7 @@ import {Method} from "../../source/index";
 import {Version} from "../../source/version";
 
 const request_original = require('request').defaults({jar: true, json: true})
+const axios = require('axios')
 
 function request(options: any): Promise<any> {
   return new Promise(function (resolve, reject) {

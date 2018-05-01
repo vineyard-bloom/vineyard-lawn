@@ -42,6 +42,7 @@ var server_1 = require("../../source/server");
 var index_1 = require("../../source/index");
 var version_1 = require("../../source/version");
 var request_original = require('request').defaults({ jar: true, json: true });
+var axios = require('axios');
 function request(options) {
     return new Promise(function (resolve, reject) {
         request_original(options, function (error, response, body) {
