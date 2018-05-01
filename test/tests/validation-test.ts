@@ -40,11 +40,11 @@ describe('validation test', function () {
   this.timeout(5000)
 
   // Axios version
-  function local_request(method: string, url: string, body?: any) {
+  function local_request(method: string, url: string, data?: any) {
     return axios.request({
       url: "http://localhost:3000/" + url,
       method: method,
-      body: body
+      data: data
     })
   }
 
@@ -112,13 +112,23 @@ describe('versioning test', function () {
   let server
   this.timeout(9000)
 
-  function local_request(method: string, url: string, body?: any) {
-    return request({
+  // Axios version
+  function local_request(method: string, url: string, data?: any) {
+    return axios.request({
       url: "http://localhost:3000/" + url,
       method: method,
-      body: body
+      data: data
     })
   }
+
+  // Request version
+  // function local_request(method: string, url: string, body?: any) {
+  //   return request({
+  //     url: "http://localhost:3000/" + url,
+  //     method: method,
+  //     body: body
+  //   })
+  // }
 
   it('simple version', async function () {
     server = new Server()
@@ -135,7 +145,7 @@ describe('versioning test', function () {
     await server.start({})
 
     const result = await local_request('post', 'v1/test')
-    assert.equal(result.message, 'success')
+    assert.equal(result.data.message, 'success')
   })
 })
 

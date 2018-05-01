@@ -70,11 +70,11 @@ describe('validation test', function () {
     var server;
     this.timeout(5000);
     // Axios version
-    function local_request(method, url, body) {
+    function local_request(method, url, data) {
         return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
-            body: body
+            data: data
         });
     }
     // Request version
@@ -133,13 +133,22 @@ describe('validation test', function () {
 describe('versioning test', function () {
     var server;
     this.timeout(9000);
-    function local_request(method, url, body) {
-        return request({
+    // Axios version
+    function local_request(method, url, data) {
+        return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
-            body: body
+            data: data
         });
     }
+    // Request version
+    // function local_request(method: string, url: string, body?: any) {
+    //   return request({
+    //     url: "http://localhost:3000/" + url,
+    //     method: method,
+    //     body: body
+    //   })
+    // }
     it('simple version', function () {
         return __awaiter(this, void 0, void 0, function () {
             var validators, versionPreprocessor, result;
@@ -163,7 +172,7 @@ describe('versioning test', function () {
                         return [4 /*yield*/, local_request('post', 'v1/test')];
                     case 2:
                         result = _a.sent();
-                        assert.equal(result.message, 'success');
+                        assert.equal(result.data.message, 'success');
                         return [2 /*return*/];
                 }
             });
