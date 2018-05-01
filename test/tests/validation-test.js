@@ -42,39 +42,56 @@ var server_1 = require("../../source/server");
 var index_1 = require("../../source/index");
 var version_1 = require("../../source/version");
 var request_original = require('request').defaults({ jar: true, json: true });
-var axios = require('axios');
-function request(options) {
-    return new Promise(function (resolve, reject) {
-        request_original(options, function (error, response, body) {
-            var options2 = options;
-            if (error)
-                reject(error);
-            else if (response.statusCode != 200) {
-                var error_1 = new Error(response.statusCode + " " + response.statusMessage);
-                error_1.body = response.body;
-                reject(error_1);
-            }
-            else
-                resolve(body);
-        });
-    });
-}
+var axios = require('axios').default;
+var axiosCookieJarSupport = require('axios-cookiejar-support').default;
+var tough = require('tough-cookie');
+axiosCookieJarSupport(axios);
+var cookieJar = new tough.CookieJar();
+axios.defaults.jar = true;
+axios.defaults.withCredentials = true;
+// Function using Request
+// function request(options: any): Promise<any> {
+//   return new Promise(function (resolve, reject) {
+//     request_original(options, function (error: Error | undefined, response: any, body: any) {
+//       const options2 = options
+//       if (error)
+//         reject(error)
+//       else if (response.statusCode != 200) {
+//         const error: any = new Error(response.statusCode + " " + response.statusMessage)
+//         error.body = response.body
+//         reject(error)
+//       }
+//       else
+//         resolve(body)
+//     })
+//   })
+// }
 describe('validation test', function () {
     var server;
     this.timeout(5000);
+    // Axios version
     function local_request(method, url, body) {
-        return request({
+        return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
             body: body
         });
     }
-    function login(username, password) {
-        return local_request('post', 'user/login', {
-            username: username,
-            password: password
-        });
-    }
+    // Request version
+    // function local_request(method: string, url: string, body?: any) {
+    //   return request({
+    //     url: "http://localhost:3000/" + url,
+    //     method: method,
+    //     body: body
+    //   })
+    // }
+    // Function is never called
+    // function login(username: string, password: string) {
+    //   return local_request('post', 'user/login', {
+    //     username: username,
+    //     password: password
+    //   })
+    // }
     before(function () {
         server = new server_1.Server();
         var validators = server.compileApiSchema(require('../source/api.json'));
@@ -94,8 +111,8 @@ describe('validation test', function () {
             assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
-            assert.equal(1, error.body.errors.length);
-            assert.equal('Missing property "weapon"', error.body.errors[0]);
+            assert.equal(1, error.response.data.errors.length);
+            assert.equal('Missing property "weapon"', error.response.data.errors[0]);
         });
     });
     it('wrong property type', function () {
@@ -104,8 +121,9 @@ describe('validation test', function () {
             assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
-            assert.equal(1, error.body.errors.length);
-            assert.equal('Property "weapon" should be a string', error.body.errors[0]);
+            // Currently returning 'Missing property "weapon"'
+            assert.equal(1, error.response.data.errors.length);
+            assert.equal('Property "weapon" should be a string', error.response.data.errors[0]);
         });
     });
     after(function () {
