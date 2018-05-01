@@ -36,12 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var version_preprocessor_1 = require("../../source/version-preprocessor");
+var lab_1 = require("../../lab");
+var webClient = new lab_1.WebClient('http://localhost:3000');
 require('source-map-support').install();
 var assert = require("assert");
 var server_1 = require("../../source/server");
 var index_1 = require("../../source/index");
 var version_1 = require("../../source/version");
-var request_original = require('request').defaults({ jar: true, json: true });
 var axios = require('axios').default;
 var axiosCookieJarSupport = require('axios-cookiejar-support').default;
 var tough = require('tough-cookie');
@@ -49,27 +50,9 @@ axiosCookieJarSupport(axios);
 var cookieJar = new tough.CookieJar();
 axios.defaults.jar = true;
 axios.defaults.withCredentials = true;
-// Function using Request
-// function request(options: any): Promise<any> {
-//   return new Promise(function (resolve, reject) {
-//     request_original(options, function (error: Error | undefined, response: any, body: any) {
-//       const options2 = options
-//       if (error)
-//         reject(error)
-//       else if (response.statusCode != 200) {
-//         const error: any = new Error(response.statusCode + " " + response.statusMessage)
-//         error.body = response.body
-//         reject(error)
-//       }
-//       else
-//         resolve(body)
-//     })
-//   })
-// }
 describe('validation test', function () {
     var server;
     this.timeout(5000);
-    // Axios version
     function local_request(method, url, data) {
         return axios.request({
             url: "http://localhost:3000/" + url,
@@ -77,21 +60,6 @@ describe('validation test', function () {
             data: data
         });
     }
-    // Request version
-    // function local_request(method: string, url: string, body?: any) {
-    //   return request({
-    //     url: "http://localhost:3000/" + url,
-    //     method: method,
-    //     body: body
-    //   })
-    // }
-    // Function is never called
-    // function login(username: string, password: string) {
-    //   return local_request('post', 'user/login', {
-    //     username: username,
-    //     password: password
-    //   })
-    // }
     before(function () {
         server = new server_1.Server();
         var validators = server.compileApiSchema(require('../source/api.json'));
@@ -121,7 +89,6 @@ describe('validation test', function () {
             assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
-            // Currently returning 'Missing property "weapon"'
             assert.equal(1, error.response.data.errors.length);
             assert.equal('Property "weapon" should be a string', error.response.data.errors[0]);
         });
@@ -133,7 +100,6 @@ describe('validation test', function () {
 describe('versioning test', function () {
     var server;
     this.timeout(9000);
-    // Axios version
     function local_request(method, url, data) {
         return axios.request({
             url: "http://localhost:3000/" + url,
@@ -141,14 +107,6 @@ describe('versioning test', function () {
             data: data
         });
     }
-    // Request version
-    // function local_request(method: string, url: string, body?: any) {
-    //   return request({
-    //     url: "http://localhost:3000/" + url,
-    //     method: method,
-    //     body: body
-    //   })
-    // }
     it('simple version', function () {
         return __awaiter(this, void 0, void 0, function () {
             var validators, versionPreprocessor, result;
@@ -178,6 +136,9 @@ describe('versioning test', function () {
             });
         });
     });
+    after(function () {
+        return server.stop();
+    });
 });
 describe('versioning-test', function () {
     it('version parsing', function () {
@@ -197,6 +158,52 @@ describe('versioning-test', function () {
             assert.equal(version.minor, 2);
             assert.equal(version.platform, 'beta');
         }
+    });
+});
+describe('API call test', function () {
+    var server;
+    this.timeout(9000);
+    before(function () {
+        server = new server_1.Server();
+        server.createEndpoints(Promise.resolve, [
+            {
+                method: index_1.Method.get,
+                path: "test",
+                action: function (request) { return Promise.resolve({ data: 'Some data' }); }
+            },
+        ]);
+        return server.start({});
+    });
+    // Add get request
+    it('correctly handles a get request', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.get('test')];
+                    case 1:
+                        result = _a.sent();
+                        console.log(result);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    // function local_request(method: string, url: string, data?: any) {
+    //   return axios.request({
+    //     url: "http://localhost:3000/" + url,
+    //     method: method,
+    //     data: data
+    //   })
+    // }
+    // it('correctly handles a get request', async function () {
+    //   const result = await local_request('get', 'test')
+    //   console.log(result)
+    //   assert.equal(result.data.message, 'success')
+    // }
+    // Add patch request
+    after(function () {
+        return server.stop();
     });
 });
 //# sourceMappingURL=validation-test.js.map
