@@ -82,6 +82,9 @@ describe('validation test', function () {
       })
   })
 
+  after(function () {
+    return server.stop()
+  })
 })
 
 describe('versioning test', function () {

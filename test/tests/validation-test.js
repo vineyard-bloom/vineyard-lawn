@@ -108,6 +108,9 @@ describe('validation test', function () {
             assert.equal('Property "weapon" should be a string', error.body.errors[0]);
         });
     });
+    after(function () {
+        return server.stop();
+    });
 });
 describe('versioning test', function () {
     var server;
