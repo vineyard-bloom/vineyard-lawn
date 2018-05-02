@@ -1,31 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var promiseRequest = require('./request-promise');
-var request = require('request');
+var axios = require('axios').default;
+var axiosCookieJarSupport = require('axios-cookiejar-support').default;
+var tough = require('tough-cookie');
+axiosCookieJarSupport(axios);
+var cookieJar = new tough.CookieJar();
+axios.defaults.jar = true;
+axios.defaults.withCredentials = true;
 var WebClient = /** @class */ (function () {
     function WebClient(url) {
         this.url = url;
-        this.jar = request.jar();
     }
     WebClient.prototype.request = function (method, path, params, data) {
-        return promiseRequest({
+        return axios.request({
             method: method,
             url: this.url + '/' + path,
-            qs: params,
-            body: data,
-            json: true,
-            jar: this.jar,
-        });
+            params: params,
+            data: data,
+        })
+            .then(function (response) { return response.data; })
+            .catch(console.error);
     };
     WebClient.prototype.get = function (path, params) {
-        var paramString = '';
-        if (params && Object.keys(params).length > 0) {
-            var array = [];
-            for (var i in params) {
-                array.push(i + '=' + params[i]);
-            }
-            paramString = '?' + array.join('&');
-        }
+        // If statement outputs a string, Axios needs an object
+        // let paramString = ''
+        // if (params && Object.keys(params).length > 0) {
+        //   const array: string[] = []
+        //   for (let i in params) {
+        //     array.push(i + '=' + params[i])
+        //   }
+        //   paramString = '?' + array.join('&')
+        // }
         return this.request('get', path, params, null);
     };
     WebClient.prototype.post = function (path, data) {

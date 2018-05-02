@@ -156,12 +156,12 @@ describe('API call test', function () {
 
   it('handles a get request', async function () {
     const result = await webClient.get('test')
-    assert.deepEqual({data: 'Test data'}, result)
+    assert.deepEqual(result, {data: 'Test data'})
   })
 
   it('handles a patch request', async function () {
     const result = await webClient.patch('test', {data: 'Some more data'})
-    assert.deepEqual({message: 'success'}, result)
+    assert.deepEqual(result, {message: 'success'})
   })
 
   after(function () {

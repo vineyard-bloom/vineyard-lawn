@@ -1,36 +1,42 @@
-const promiseRequest = require('./request-promise')
-const request =  require('request')
+const axios = require('axios').default
+const axiosCookieJarSupport = require('axios-cookiejar-support').default
+const tough = require('tough-cookie')
+
+axiosCookieJarSupport(axios)
+const cookieJar = new tough.CookieJar()
+
+axios.defaults.jar = true
+axios.defaults.withCredentials = true
 
 export class WebClient {
   url: string
-  jar: any
 
   constructor(url: string) {
-    this.url = url;
-    this.jar = request.jar()
+    this.url = url
   }
 
   private request(method: string, path: string, params: any, data: any) {
-    return promiseRequest({
+    return axios.request({
       method: method,
       url: this.url + '/' + path,
-      qs: params,
-      body: data,
-      json: true,
-      jar: this.jar,
+      params: params,
+      data: data,
     })
+      .then(response => response.data)
+      .catch(console.error)
   }
 
   get(path: string, params?: any) {
-    let paramString = ''
+    // If statement outputs a string, Axios needs an object
+    // let paramString = ''
 
-    if (params && Object.keys(params).length > 0) {
-      const array: string[] = []
-      for (let i in params) {
-        array.push(i + '=' + params[i])
-      }
-      paramString = '?' + array.join('&')
-    }
+    // if (params && Object.keys(params).length > 0) {
+    //   const array: string[] = []
+    //   for (let i in params) {
+    //     array.push(i + '=' + params[i])
+    //   }
+    //   paramString = '?' + array.join('&')
+    // }
 
     return this.request('get', path, params, null)
   }

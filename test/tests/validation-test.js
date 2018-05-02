@@ -188,7 +188,7 @@ describe('API call test', function () {
                     case 0: return [4 /*yield*/, webClient.get('test')];
                     case 1:
                         result = _a.sent();
-                        assert.deepEqual({ data: 'Test data' }, result);
+                        assert.deepEqual(result, { data: 'Test data' });
                         return [2 /*return*/];
                 }
             });
@@ -202,7 +202,7 @@ describe('API call test', function () {
                     case 0: return [4 /*yield*/, webClient.patch('test', { data: 'Some more data' })];
                     case 1:
                         result = _a.sent();
-                        assert.deepEqual({ message: 'success' }, result);
+                        assert.deepEqual(result, { message: 'success' });
                         return [2 /*return*/];
                 }
             });
