@@ -63,7 +63,7 @@ describe('validation test', function () {
     before(function () {
         server = new server_1.Server();
         var validators = server.compileApiSchema(require('../source/api.json'));
-        server.createEndpoints(Promise.resolve, [
+        server.createEndpoints(function () { return Promise.resolve(); }, [
             {
                 method: index_1.Method.post,
                 path: "test",
@@ -164,18 +164,23 @@ describe('API call test', function () {
     var server;
     this.timeout(9000);
     before(function () {
+        var data = 'Test data';
         server = new server_1.Server();
-        server.createEndpoints(Promise.resolve, [
+        server.createEndpoints(function () { return Promise.resolve(); }, [
             {
                 method: index_1.Method.get,
                 path: "test",
-                action: function (request) { return Promise.resolve({ data: 'Some data' }); }
+                action: function (request) { return Promise.resolve({ data: data }); }
+            },
+            {
+                method: index_1.Method.patch,
+                path: "test",
+                action: function (request) { return Promise.resolve({ message: 'success' }); }
             },
         ]);
         return server.start({});
     });
-    // Add get request
-    it('correctly handles a get request', function () {
+    it('handles a get request', function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
             return __generator(this, function (_a) {
@@ -183,25 +188,26 @@ describe('API call test', function () {
                     case 0: return [4 /*yield*/, webClient.get('test')];
                     case 1:
                         result = _a.sent();
-                        console.log(result);
+                        assert.deepEqual({ data: 'Test data' }, result);
                         return [2 /*return*/];
                 }
             });
         });
     });
-    // function local_request(method: string, url: string, data?: any) {
-    //   return axios.request({
-    //     url: "http://localhost:3000/" + url,
-    //     method: method,
-    //     data: data
-    //   })
-    // }
-    // it('correctly handles a get request', async function () {
-    //   const result = await local_request('get', 'test')
-    //   console.log(result)
-    //   assert.equal(result.data.message, 'success')
-    // }
-    // Add patch request
+    it('handles a patch request', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.patch('test', { data: 'Some more data' })];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual({ message: 'success' }, result);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
     after(function () {
         return server.stop();
     });

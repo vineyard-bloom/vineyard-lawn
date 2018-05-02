@@ -1,22 +1,22 @@
-import {VersionPreprocessor} from "../../source/version-preprocessor";
+import {VersionPreprocessor} from "../../source/version-preprocessor"
 import {WebClient} from "../../lab"
 const webClient = new WebClient('http://localhost:3000')
 
 require('source-map-support').install()
 import * as assert from 'assert'
-import {Server} from "../../source/server";
-import {Method} from "../../source/index";
-import {Version} from "../../source/version";
+import {Server} from "../../source/server"
+import {Method} from "../../source/index"
+import {Version} from "../../source/version"
 
-const axios = require('axios').default;
+const axios = require('axios').default
 const axiosCookieJarSupport = require('axios-cookiejar-support').default
 const tough = require('tough-cookie')
 
 axiosCookieJarSupport(axios)
-const cookieJar = new tough.CookieJar();
+const cookieJar = new tough.CookieJar()
 
-axios.defaults.jar = true;
-axios.defaults.withCredentials = true;
+axios.defaults.jar = true
+axios.defaults.withCredentials = true
 
 describe('validation test', function () {
   let server
@@ -33,7 +33,7 @@ describe('validation test', function () {
   before(function () {
     server = new Server()
     const validators = server.compileApiSchema(require('../source/api.json'))
-    server.createEndpoints(Promise.resolve, [
+    server.createEndpoints(() => Promise.resolve(), [
       {
         method: Method.post,
         path: "test",
@@ -136,39 +136,33 @@ describe('API call test', function () {
   this.timeout(9000)
 
   before(function () {
+    let data = 'Test data'
     server = new Server()
-    server.createEndpoints(Promise.resolve, [
+    server.createEndpoints(() => Promise.resolve(), [
       {
         method: Method.get,
         path: "test",
-        action: (request: any) => Promise.resolve({data: 'Some data'})
+        action: (request: any) => Promise.resolve({data})
+      },
+      {
+        method: Method.patch,
+        path: "test",
+        action: (request: any) => Promise.resolve({message: 'success'})
       },
     ])
 
     return server.start({})
   })
 
-  // Add get request
-  it('correctly handles a get request', async function () {
+  it('handles a get request', async function () {
     const result = await webClient.get('test')
-    console.log(result)
+    assert.deepEqual({data: 'Test data'}, result)
   })
 
-  // function local_request(method: string, url: string, data?: any) {
-  //   return axios.request({
-  //     url: "http://localhost:3000/" + url,
-  //     method: method,
-  //     data: data
-  //   })
-  // }
-
-  // it('correctly handles a get request', async function () {
-  //   const result = await local_request('get', 'test')
-  //   console.log(result)
-  //   assert.equal(result.data.message, 'success')
-  // }
-
-  // Add patch request
+  it('handles a patch request', async function () {
+    const result = await webClient.patch('test', {data: 'Some more data'})
+    assert.deepEqual({message: 'success'}, result)
+  })
 
   after(function () {
     return server.stop()
