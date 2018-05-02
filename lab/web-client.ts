@@ -15,7 +15,7 @@ export class WebClient {
     this.url = url
   }
 
-  private request(method: string, path: string, params: any, data: any) {
+  private async request(method: string, path: string, params?: { [queryParameter: string]: any }, data?: any): Promise<any> {
     return axios.request({
       method: method,
       url: this.url + '/' + path,
@@ -26,31 +26,20 @@ export class WebClient {
       .catch(console.error)
   }
 
-  get(path: string, params?: any) {
-    // If statement outputs a string, Axios needs an object
-    // let paramString = ''
-
-    // if (params && Object.keys(params).length > 0) {
-    //   const array: string[] = []
-    //   for (let i in params) {
-    //     array.push(i + '=' + params[i])
-    //   }
-    //   paramString = '?' + array.join('&')
-    // }
-
-    return this.request('get', path, params, null)
+  async get(path: string, params?: any): Promise<any> {
+    return this.request('get', path, params, undefined)
   }
 
-  post(path: string, data: any = {}) {
-    return this.request('post', path, null, data)
+  async post(path: string, data: any = {}): Promise<any> {
+    return this.request('post', path, undefined, data)
   }
 
-  put(path: string, data: any) {
-    return this.request('put', path, null, data)
+  async put(path: string, data: any): Promise<any> {
+    return this.request('put', path, undefined, data)
   }
 
-  patch(path: string, data: any) {
-    return this.request('patch', path, null, data)
+  async patch(path: string, data: any): Promise<any> {
+    return this.request('patch', path, undefined, data)
   }
 
 }
