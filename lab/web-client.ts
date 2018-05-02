@@ -22,8 +22,11 @@ export class WebClient {
       params: params,
       data: data,
     })
-      .then(response => response.data)
-      .catch(console.error)
+      .then((response: any) => response.data)
+      .catch((error: any) => {
+        console.log(error)
+        return error
+      })
   }
 
   async get(path: string, params?: any): Promise<any> {

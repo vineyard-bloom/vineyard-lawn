@@ -19,7 +19,7 @@ axios.defaults.jar = true
 axios.defaults.withCredentials = true
 
 describe('validation test', function () {
-  let server
+  let server: any
   this.timeout(5000)
 
   function local_request(method: string, url: string, data?: any) {
@@ -47,10 +47,10 @@ describe('validation test', function () {
 
   it('missing required', function () {
     return local_request('post', 'test')
-      .then(result => {
+      .then((result: any) => {
         assert(false, 'Should have thrown an error')
       })
-      .catch(error => {
+      .catch((error: any) => {
         assert.equal(1, error.response.data.errors.length)
         assert.equal('Missing property "weapon"', error.response.data.errors[0])
       })
@@ -58,10 +58,10 @@ describe('validation test', function () {
 
   it('wrong property type', function () {
     return local_request('post', 'test', {weapon: 640})
-      .then(result => {
+      .then((result: any) => {
         assert(false, 'Should have thrown an error')
       })
-      .catch(error => {
+      .catch((error: any) => {
         assert.equal(1, error.response.data.errors.length)
         assert.equal('Property "weapon" should be a string', error.response.data.errors[0])
       })
@@ -73,7 +73,7 @@ describe('validation test', function () {
 })
 
 describe('versioning test', function () {
-  let server
+  let server: any
   this.timeout(9000)
 
   function local_request(method: string, url: string, data?: any) {
@@ -88,7 +88,7 @@ describe('versioning test', function () {
     server = new Server()
     const validators = server.compileApiSchema(require('../source/api.json'))
     const versionPreprocessor = new VersionPreprocessor([new Version(1)])
-    server.createEndpoints(r => versionPreprocessor.simpleVersion(r), [
+    server.createEndpoints((r: any) => versionPreprocessor.simpleVersion(r), [
       {
         method: Method.post,
         path: "test",
@@ -100,6 +100,11 @@ describe('versioning test', function () {
 
     const result = await local_request('post', 'v1/test')
     assert.equal(result.data.message, 'success')
+  })
+
+  it('creates jar for cookies', async function() {
+    let result = await local_request('post', 'v1/test')
+    assert(result.config.jar)
   })
 
   after(function () {
@@ -132,17 +137,27 @@ describe('versioning-test', function () {
 })
 
 describe('API call test', function () {
-  let server
+  let server: any
   this.timeout(9000)
 
   before(function () {
-    let data = 'Test data'
     server = new Server()
     server.createEndpoints(() => Promise.resolve(), [
       {
         method: Method.get,
         path: "test",
-        action: (request: any) => Promise.resolve({data})
+        action: (request: any) => Promise.resolve({data: 'Test data'})
+      },
+      {
+        method: Method.get,
+        path: "params",
+        params: {name: 'Jane'},
+        action: (request: any) => Promise.resolve({data: 'Jane data'})
+      },
+      {
+        method: Method.post,
+        path: "test",
+        action: (request: any) => Promise.resolve({message: 'post successful'})
       },
       {
         method: Method.patch,
@@ -159,9 +174,19 @@ describe('API call test', function () {
     assert.deepEqual(result, {data: 'Test data'})
   })
 
+  it('handles a post request', async function () {
+    const result = await webClient.post('test', {data: 'New data'})
+    assert.deepEqual(result, {message: 'post successful'})
+  })
+
   it('handles a patch request', async function () {
     const result = await webClient.patch('test', {data: 'Some more data'})
     assert.deepEqual(result, {message: 'success'})
+  })
+
+  it('adds query string params to URL', async function () {
+    const result = await webClient.get('params', {name: 'Jane'})
+    assert.deepEqual(result, {data: 'Jane data'})
   })
 
   after(function () {

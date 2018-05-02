@@ -136,6 +136,20 @@ describe('versioning test', function () {
             });
         });
     });
+    it('creates jar for cookies', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, local_request('post', 'v1/test')];
+                    case 1:
+                        result = _a.sent();
+                        assert(result.config.jar);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
     after(function () {
         return server.stop();
     });
@@ -164,13 +178,23 @@ describe('API call test', function () {
     var server;
     this.timeout(9000);
     before(function () {
-        var data = 'Test data';
         server = new server_1.Server();
         server.createEndpoints(function () { return Promise.resolve(); }, [
             {
                 method: index_1.Method.get,
                 path: "test",
-                action: function (request) { return Promise.resolve({ data: data }); }
+                action: function (request) { return Promise.resolve({ data: 'Test data' }); }
+            },
+            {
+                method: index_1.Method.get,
+                path: "params",
+                params: { name: 'Jane' },
+                action: function (request) { return Promise.resolve({ data: 'Jane data' }); }
+            },
+            {
+                method: index_1.Method.post,
+                path: "test",
+                action: function (request) { return Promise.resolve({ message: 'post successful' }); }
             },
             {
                 method: index_1.Method.patch,
@@ -194,6 +218,20 @@ describe('API call test', function () {
             });
         });
     });
+    it('handles a post request', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.post('test', { data: 'New data' })];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual(result, { message: 'post successful' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
     it('handles a patch request', function () {
         return __awaiter(this, void 0, void 0, function () {
             var result;
@@ -203,6 +241,20 @@ describe('API call test', function () {
                     case 1:
                         result = _a.sent();
                         assert.deepEqual(result, { message: 'success' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('adds query string params to URL', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.get('params', { name: 'Jane' })];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual(result, { data: 'Jane data' });
                         return [2 /*return*/];
                 }
             });

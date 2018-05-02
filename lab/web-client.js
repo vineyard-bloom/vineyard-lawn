@@ -56,7 +56,10 @@ var WebClient = /** @class */ (function () {
                         data: data,
                     })
                         .then(function (response) { return response.data; })
-                        .catch(console.error)];
+                        .catch(function (error) {
+                        console.log(error);
+                        return error;
+                    })];
             });
         });
     };
