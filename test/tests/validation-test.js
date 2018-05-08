@@ -36,48 +36,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var version_preprocessor_1 = require("../../source/version-preprocessor");
+var lab_1 = require("../../lab");
+var webClient = new lab_1.WebClient('http://localhost:3000');
 require('source-map-support').install();
 var assert = require("assert");
 var server_1 = require("../../source/server");
 var index_1 = require("../../source/index");
 var version_1 = require("../../source/version");
-var request_original = require('request').defaults({ jar: true, json: true });
-function request(options) {
-    return new Promise(function (resolve, reject) {
-        request_original(options, function (error, response, body) {
-            var options2 = options;
-            if (error)
-                reject(error);
-            else if (response.statusCode != 200) {
-                var error_1 = new Error(response.statusCode + " " + response.statusMessage);
-                error_1.body = response.body;
-                reject(error_1);
-            }
-            else
-                resolve(body);
-        });
-    });
-}
+var axios = require('axios').default;
+var axiosCookieJarSupport = require('axios-cookiejar-support').default;
+var tough = require('tough-cookie');
+axiosCookieJarSupport(axios);
+var cookieJar = new tough.CookieJar();
+axios.defaults.jar = true;
+axios.defaults.withCredentials = true;
 describe('validation test', function () {
     var server;
     this.timeout(5000);
-    function local_request(method, url, body) {
-        return request({
+    function local_request(method, url, data) {
+        return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
-            body: body
-        });
-    }
-    function login(username, password) {
-        return local_request('post', 'user/login', {
-            username: username,
-            password: password
+            data: data
         });
     }
     before(function () {
         server = new server_1.Server();
         var validators = server.compileApiSchema(require('../source/api.json'));
-        server.createEndpoints(Promise.resolve, [
+        server.createEndpoints(function () { return Promise.resolve(); }, [
             {
                 method: index_1.Method.post,
                 path: "test",
@@ -93,8 +79,8 @@ describe('validation test', function () {
             assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
-            assert.equal(1, error.body.errors.length);
-            assert.equal('Missing property "weapon"', error.body.errors[0]);
+            assert.equal(1, error.response.data.errors.length);
+            assert.equal('Missing property "weapon"', error.response.data.errors[0]);
         });
     });
     it('wrong property type', function () {
@@ -103,19 +89,22 @@ describe('validation test', function () {
             assert(false, 'Should have thrown an error');
         })
             .catch(function (error) {
-            assert.equal(1, error.body.errors.length);
-            assert.equal('Property "weapon" should be a string', error.body.errors[0]);
+            assert.equal(1, error.response.data.errors.length);
+            assert.equal('Property "weapon" should be a string', error.response.data.errors[0]);
         });
+    });
+    after(function () {
+        return server.stop();
     });
 });
 describe('versioning test', function () {
     var server;
     this.timeout(9000);
-    function local_request(method, url, body) {
-        return request({
+    function local_request(method, url, data) {
+        return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
-            body: body
+            data: data
         });
     }
     it('simple version', function () {
@@ -141,11 +130,28 @@ describe('versioning test', function () {
                         return [4 /*yield*/, local_request('post', 'v1/test')];
                     case 2:
                         result = _a.sent();
-                        assert.equal(result.message, 'success');
+                        assert.equal(result.data.message, 'success');
                         return [2 /*return*/];
                 }
             });
         });
+    });
+    it('creates jar for cookies', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, local_request('post', 'v1/test')];
+                    case 1:
+                        result = _a.sent();
+                        assert(result.config.jar);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    after(function () {
+        return server.stop();
     });
 });
 describe('versioning-test', function () {
@@ -166,6 +172,96 @@ describe('versioning-test', function () {
             assert.equal(version.minor, 2);
             assert.equal(version.platform, 'beta');
         }
+    });
+});
+describe('API call test', function () {
+    var server;
+    this.timeout(9000);
+    before(function () {
+        server = new server_1.Server();
+        server.createEndpoints(function () { return Promise.resolve(); }, [
+            {
+                method: index_1.Method.get,
+                path: "test",
+                action: function (request) { return Promise.resolve({ data: 'Test data' }); }
+            },
+            {
+                method: index_1.Method.get,
+                path: "params",
+                params: { name: 'Jane' },
+                action: function (request) { return Promise.resolve({ data: 'Jane data' }); }
+            },
+            {
+                method: index_1.Method.post,
+                path: "test",
+                action: function (request) { return Promise.resolve({ message: 'post successful' }); }
+            },
+            {
+                method: index_1.Method.patch,
+                path: "test",
+                action: function (request) { return Promise.resolve({ message: 'success' }); }
+            },
+        ]);
+        return server.start({});
+    });
+    it('handles a get request', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.get('test')];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual(result, { data: 'Test data' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('handles a post request', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.post('test', { data: 'New data' })];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual(result, { message: 'post successful' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('handles a patch request', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.patch('test', { data: 'Some more data' })];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual(result, { message: 'success' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('adds query string params to URL', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, webClient.get('params', { name: 'Jane' })];
+                    case 1:
+                        result = _a.sent();
+                        assert.deepEqual(result, { data: 'Jane data' });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    after(function () {
+        return server.stop();
     });
 });
 //# sourceMappingURL=validation-test.js.map

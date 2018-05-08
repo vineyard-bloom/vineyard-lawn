@@ -1,10 +1,9 @@
 export declare class WebClient {
     url: string;
-    jar: any;
     constructor(url: string);
-    private request(method, path, params, data);
-    get(path: string, params?: any): any;
-    post(path: string, data?: any): any;
-    put(path: string, data: any): any;
-    patch(path: string, data: any): any;
+    private request(method, path, params?, data?);
+    get(path: string, params?: any): Promise<any>;
+    post(path: string, data?: any): Promise<any>;
+    put(path: string, data: any): Promise<any>;
+    patch(path: string, data: any): Promise<any>;
 }
