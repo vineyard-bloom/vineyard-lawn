@@ -7,51 +7,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var version_preprocessor_1 = require("../../source/version-preprocessor");
-var lab_1 = require("../../lab");
-var webClient = new lab_1.WebClient('http://localhost:3000');
+const version_preprocessor_1 = require("../../source/version-preprocessor");
+const lab_1 = require("../../lab");
+const webClient = new lab_1.WebClient('http://localhost:3000');
 require('source-map-support').install();
-var assert = require("assert");
-var server_1 = require("../../source/server");
-var index_1 = require("../../source/index");
-var version_1 = require("../../source/version");
-var axios = require('axios').default;
-var axiosCookieJarSupport = require('axios-cookiejar-support').default;
-var tough = require('tough-cookie');
+const assert = require("assert");
+const server_1 = require("../../source/server");
+const index_1 = require("../../source/index");
+const version_1 = require("../../source/version");
+const axios = require('axios').default;
+const axiosCookieJarSupport = require('axios-cookiejar-support').default;
+const tough = require('tough-cookie');
 axiosCookieJarSupport(axios);
-var cookieJar = new tough.CookieJar();
+const cookieJar = new tough.CookieJar();
 axios.defaults.jar = true;
 axios.defaults.withCredentials = true;
 describe('validation test', function () {
-    var server;
+    let server;
     this.timeout(5000);
     function local_request(method, url, data) {
         return axios.request({
@@ -62,12 +35,12 @@ describe('validation test', function () {
     }
     before(function () {
         server = new server_1.Server();
-        var validators = server.compileApiSchema(require('../source/api.json'));
-        server.createEndpoints(function () { return Promise.resolve(); }, [
+        const validators = server.compileApiSchema(require('../source/api.json'));
+        server.createEndpoints(() => Promise.resolve(), [
             {
                 method: index_1.Method.post,
                 path: "test",
-                action: function (request) { return Promise.resolve(); },
+                action: (request) => Promise.resolve(),
                 validator: validators.test
             },
         ]);
@@ -75,20 +48,20 @@ describe('validation test', function () {
     });
     it('missing required', function () {
         return local_request('post', 'test')
-            .then(function (result) {
+            .then((result) => {
             assert(false, 'Should have thrown an error');
         })
-            .catch(function (error) {
+            .catch((error) => {
             assert.equal(1, error.response.data.errors.length);
             assert.equal('Missing property "weapon"', error.response.data.errors[0]);
         });
     });
     it('wrong property type', function () {
         return local_request('post', 'test', { weapon: 640 })
-            .then(function (result) {
+            .then((result) => {
             assert(false, 'Should have thrown an error');
         })
-            .catch(function (error) {
+            .catch((error) => {
             assert.equal(1, error.response.data.errors.length);
             assert.equal('Property "weapon" should be a string', error.response.data.errors[0]);
         });
@@ -98,7 +71,7 @@ describe('validation test', function () {
     });
 });
 describe('versioning test', function () {
-    var server;
+    let server;
     this.timeout(9000);
     function local_request(method, url, data) {
         return axios.request({
@@ -108,46 +81,27 @@ describe('versioning test', function () {
         });
     }
     it('simple version', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var validators, versionPreprocessor, result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        server = new server_1.Server();
-                        validators = server.compileApiSchema(require('../source/api.json'));
-                        versionPreprocessor = new version_preprocessor_1.VersionPreprocessor([new version_1.Version(1)]);
-                        server.createEndpoints(function (r) { return versionPreprocessor.simpleVersion(r); }, [
-                            {
-                                method: index_1.Method.post,
-                                path: "test",
-                                action: function (request) { return Promise.resolve({ message: 'success' }); },
-                                validator: validators.none
-                            },
-                        ]);
-                        return [4 /*yield*/, server.start({})];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, local_request('post', 'v1/test')];
-                    case 2:
-                        result = _a.sent();
-                        assert.equal(result.data.message, 'success');
-                        return [2 /*return*/];
-                }
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            server = new server_1.Server();
+            const validators = server.compileApiSchema(require('../source/api.json'));
+            const versionPreprocessor = new version_preprocessor_1.VersionPreprocessor([new version_1.Version(1)]);
+            server.createEndpoints((r) => versionPreprocessor.simpleVersion(r), [
+                {
+                    method: index_1.Method.post,
+                    path: "test",
+                    action: (request) => Promise.resolve({ message: 'success' }),
+                    validator: validators.none
+                },
+            ]);
+            yield server.start({});
+            const result = yield local_request('post', 'v1/test');
+            assert.equal(result.data.message, 'success');
         });
     });
     it('creates jar for cookies', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, local_request('post', 'v1/test')];
-                    case 1:
-                        result = _a.sent();
-                        assert(result.config.jar);
-                        return [2 /*return*/];
-                }
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = yield local_request('post', 'v1/test');
+            assert(result.config.jar);
         });
     });
     after(function () {
@@ -157,17 +111,17 @@ describe('versioning test', function () {
 describe('versioning-test', function () {
     it('version parsing', function () {
         {
-            var version = new version_1.Version(1);
+            const version = new version_1.Version(1);
             assert.equal(version.major, 1);
             assert.equal(version.minor, 0);
             assert.equal(version.platform, 'none');
         }
         {
-            var version = new version_1.Version('1');
+            const version = new version_1.Version('1');
             assert.equal(version.major, 1);
         }
         {
-            var version = new version_1.Version('1.2.beta');
+            const version = new version_1.Version('1.2.beta');
             assert.equal(version.major, 1);
             assert.equal(version.minor, 2);
             assert.equal(version.platform, 'beta');
@@ -175,89 +129,57 @@ describe('versioning-test', function () {
     });
 });
 describe('API call test', function () {
-    var server;
+    let server;
     this.timeout(9000);
     before(function () {
         server = new server_1.Server();
-        server.createEndpoints(function () { return Promise.resolve(); }, [
+        server.createEndpoints(() => Promise.resolve(), [
             {
                 method: index_1.Method.get,
                 path: "test",
-                action: function (request) { return Promise.resolve({ data: 'Test data' }); }
+                action: (request) => Promise.resolve({ data: 'Test data' })
             },
             {
                 method: index_1.Method.get,
                 path: "params",
                 params: { name: 'Jane' },
-                action: function (request) { return Promise.resolve({ data: 'Jane data' }); }
+                action: (request) => Promise.resolve({ data: 'Jane data' })
             },
             {
                 method: index_1.Method.post,
                 path: "test",
-                action: function (request) { return Promise.resolve({ message: 'post successful' }); }
+                action: (request) => Promise.resolve({ message: 'post successful' })
             },
             {
                 method: index_1.Method.patch,
                 path: "test",
-                action: function (request) { return Promise.resolve({ message: 'success' }); }
+                action: (request) => Promise.resolve({ message: 'success' })
             },
         ]);
         return server.start({});
     });
     it('handles a get request', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, webClient.get('test')];
-                    case 1:
-                        result = _a.sent();
-                        assert.deepEqual(result, { data: 'Test data' });
-                        return [2 /*return*/];
-                }
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield webClient.get('test');
+            assert.deepEqual(result, { data: 'Test data' });
         });
     });
     it('handles a post request', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, webClient.post('test', { data: 'New data' })];
-                    case 1:
-                        result = _a.sent();
-                        assert.deepEqual(result, { message: 'post successful' });
-                        return [2 /*return*/];
-                }
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield webClient.post('test', { data: 'New data' });
+            assert.deepEqual(result, { message: 'post successful' });
         });
     });
     it('handles a patch request', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, webClient.patch('test', { data: 'Some more data' })];
-                    case 1:
-                        result = _a.sent();
-                        assert.deepEqual(result, { message: 'success' });
-                        return [2 /*return*/];
-                }
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield webClient.patch('test', { data: 'Some more data' });
+            assert.deepEqual(result, { message: 'success' });
         });
     });
     it('adds query string params to URL', function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, webClient.get('params', { name: 'Jane' })];
-                    case 1:
-                        result = _a.sent();
-                        assert.deepEqual(result, { data: 'Jane data' });
-                        return [2 /*return*/];
-                }
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield webClient.get('params', { name: 'Jane' });
+            assert.deepEqual(result, { data: 'Jane data' });
         });
     });
     after(function () {

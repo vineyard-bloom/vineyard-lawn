@@ -5,7 +5,7 @@ export declare enum Method {
     patch = 1,
     post = 2,
     put = 3,
-    delete = 4,
+    delete = 4
 }
 export interface Request {
     data: any;

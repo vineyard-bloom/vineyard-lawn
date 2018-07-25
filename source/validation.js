@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var errors_1 = require("./errors");
-var characterPattern = /^\^\[(.*?)\][*+]\$$/;
-var messageFormatters = {
+const errors_1 = require("./errors");
+const characterPattern = /^\^\[(.*?)\][*+]\$$/;
+const messageFormatters = {
     maxLength: function (error) {
         return new errors_1.Bad_Request(error.dataPath.substr(1) + ' can not be more than ' + error.params.limit + ' characters.', {
             key: 'max-length',
@@ -22,14 +22,14 @@ var messageFormatters = {
         });
     },
     pattern: function (error, data) {
-        var property = error.dataPath.substr(1);
-        var match;
+        const property = error.dataPath.substr(1);
+        let match;
         if (match = error.params.pattern.match(characterPattern)) {
-            var findInvalid = new RegExp('[^' + match[1] + ']');
-            var value = data[property];
+            const findInvalid = new RegExp('[^' + match[1] + ']');
+            const value = data[property];
             if (!value || !value.match)
                 return new errors_1.Bad_Request('Invalid value for property "' + property + '"');
-            var character = value.match(findInvalid);
+            const character = value.match(findInvalid);
             return new errors_1.Bad_Request('Invalid char "' + character[0] + '" in "' + property, {
                 key: "invalid-char",
                 data: {
@@ -41,14 +41,14 @@ var messageFormatters = {
         return property + ' ' + error.message;
     },
     required: function (error) {
-        var property = error.params.missingProperty;
-        var path = error.dataPath
+        const property = error.params.missingProperty;
+        const path = error.dataPath
             ? [error.dataPath, property].join('.')
             : property;
         return 'Missing property "' + path + '"';
     },
     type: function (error) {
-        var path = error.dataPath.substr(1);
+        const path = error.dataPath.substr(1);
         return 'Property "' + path + '" should be a ' + error.params.type;
     },
     additionalProperties: function (error) {
@@ -56,14 +56,14 @@ var messageFormatters = {
     }
 };
 function formatErrorMessage(error, data) {
-    var formatter = messageFormatters[error.keyword];
+    const formatter = messageFormatters[error.keyword];
     return formatter
         ? formatter(error, data)
         : error.message;
 }
 function validate(validator, data, ajv) {
     if (!validator(data)) {
-        var errors = validator.errors.map(function (e) { return formatErrorMessage(e, data); });
+        const errors = validator.errors.map((e) => formatErrorMessage(e, data));
         // It seems like ajv should be returning multiple errors but it's only returning the first error.
         throw new errors_1.Bad_Request('Bad Request', { errors: errors, key: '' });
         // if (typeof errors[0] === 'string') {

@@ -26,7 +26,7 @@
     "axios-cookiejar-support": "^0.3.5",
     "mocha": "^4.0.1",
     "source-map-support": "^0.4.14",
-    "typescript": "^2.1.6",
+    "typescript": "^2.9.2",
     "vineyard-docs": "vineyard-bloom/vineyard-docs#1.0.0-beta"
   }
 }

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var body_parser = require('body-parser');
-var validation_1 = require("./validation");
-var error_handling_1 = require("./error-handling");
-var version_1 = require("./version");
-var types_1 = require("./types");
-var json_temp = body_parser.json();
-var json_parser = function (req, res, next) {
+const body_parser = require('body-parser');
+const validation_1 = require("./validation");
+const error_handling_1 = require("./error-handling");
+const version_1 = require("./version");
+const types_1 = require("./types");
+const json_temp = body_parser.json();
+const json_parser = function (req, res, next) {
     json_temp(req, res, next);
 };
 function logErrorToConsole(error) {
@@ -16,29 +16,26 @@ function logErrorToConsole(error) {
         console.error("Error", error.status, error.stack);
 }
 exports.logErrorToConsole = logErrorToConsole;
-var DefaultRequestListener = /** @class */ (function () {
-    function DefaultRequestListener() {
-    }
-    DefaultRequestListener.prototype.onRequest = function (request, response, res) {
+class DefaultRequestListener {
+    onRequest(request, response, res) {
         return;
-    };
-    DefaultRequestListener.prototype.onError = function (error, request) {
+    }
+    onError(error, request) {
         logErrorToConsole(error);
         return;
-    };
-    return DefaultRequestListener;
-}());
+    }
+}
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function getArguments(req) {
-    var result = req.body || {};
-    for (var i in req.query) {
+    const result = req.body || {};
+    for (let i in req.query) {
         result[i] = req.query[i];
     }
     return result;
 }
 function formatRequest(req) {
-    var data = getArguments(req);
-    var request = {
+    const data = getArguments(req);
+    const request = {
         data: data,
         session: req.session,
         version: undefined,
@@ -61,7 +58,7 @@ function createHandler(endpoint, action, ajv, listener) {
     if (endpoint.validator && !ajv)
         throw new Error("Lawn.create_handler argument ajv cannot be undefined when endpoints have validators.");
     return function (req, res) {
-        var request;
+        let request;
         try {
             request = formatRequest(req);
         }
@@ -123,20 +120,19 @@ function registerHttpHandler(app, path, method, handler, middleware) {
     }
 }
 function attachHandler(app, endpoint, handler) {
-    var path = endpoint.path;
+    let path = endpoint.path;
     if (path[0] != '/')
         path = '/' + path;
-    var middleware = endpoint.middleware || [];
+    const middleware = endpoint.middleware || [];
     registerHttpHandler(app, path, endpoint.method, handler, middleware);
     registerHttpHandler(app, '/:version' + path, endpoint.method, handler, middleware);
 }
 exports.attachHandler = attachHandler;
-function createEndpoint(app, endpoint, preprocessor, ajv, listener) {
-    if (listener === void 0) { listener = new DefaultRequestListener(); }
-    var action = preprocessor
-        ? function (request) { return preprocessor(request).then(function (request) { return endpoint.action(request); }); }
+function createEndpoint(app, endpoint, preprocessor, ajv, listener = new DefaultRequestListener()) {
+    const action = preprocessor
+        ? (request) => preprocessor(request).then(request => endpoint.action(request))
         : endpoint.action;
-    var handler = createHandler(endpoint, action, ajv, listener);
+    const handler = createHandler(endpoint, action, ajv, listener);
     attachHandler(app, endpoint, handler);
 }
 exports.createEndpoint = createEndpoint;
@@ -153,10 +149,8 @@ exports.createEndpoint = createEndpoint;
  * @param listener  Callback fired after each request in the endpoints is handled
  *
  */
-function createEndpoints(app, endpoints, preprocessor, ajv, listener) {
-    if (listener === void 0) { listener = new DefaultRequestListener(); }
-    for (var _i = 0, endpoints_1 = endpoints; _i < endpoints_1.length; _i++) {
-        var endpoint = endpoints_1[_i];
+function createEndpoints(app, endpoints, preprocessor, ajv, listener = new DefaultRequestListener()) {
+    for (let endpoint of endpoints) {
         createEndpoint(app, endpoint, preprocessor, ajv, listener);
     }
 }

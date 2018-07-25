@@ -6,9 +6,9 @@ const simplePattern = /^v(\d+)$/
 const defaultPlatform = 'none'
 
 export class Version {
-  major: number
-  minor: number
-  platform: string
+  major: number = 1
+  minor: number = 0
+  platform: string = ''
 
   static createFromString(text: string): Version | undefined {
     const match = text.match(advancedPattern)
