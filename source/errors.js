@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class HttpError extends Error {
     constructor(message = "Server Error", status = 500, body = {}) {
         super(message);
+        this.key = '';
         this.status = status;
         this.message = message; // super(message) doesn't seem to be working.
         this.body = body;

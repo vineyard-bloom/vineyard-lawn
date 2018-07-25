@@ -3,7 +3,7 @@
 export class HttpError extends Error {
   status: number
   body: any
-  key: string
+  key: string = ''
   message: string
 
   constructor(message: string = "Server Error", status: number = 500, body = {}) {
