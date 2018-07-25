@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import * as express from "express";
 import { EndpointInfo, RequestListener, RequestProcessor, ValidationCompiler } from "./types";
 export interface SSLConfig {
@@ -23,7 +22,7 @@ export declare class Server implements ValidationCompiler {
      * @param requestListener   Callback fired any time a request is received
      */
     constructor(defaultPreprocessor?: RequestProcessor, requestListener?: RequestListener);
-    private checkAjv();
+    private checkAjv;
     /**
      * Compiles an API vaidation schema using ajv.
      */
