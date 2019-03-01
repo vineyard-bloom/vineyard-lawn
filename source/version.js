@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const errors_1 = require("./errors");
-const advancedPattern = /^(\d+)(?:\.(\d+)(?:\.([a-z]+))?)?$/;
-const simplePattern = /^v(\d+)$/;
-const defaultPlatform = 'none';
-class Version {
-    constructor(majorOrString, minor = 0, platform = defaultPlatform) {
+var errors_1 = require("./errors");
+var advancedPattern = /^(\d+)(?:\.(\d+)(?:\.([a-z]+))?)?$/;
+var simplePattern = /^v(\d+)$/;
+var defaultPlatform = 'none';
+var Version = /** @class */ (function () {
+    function Version(majorOrString, minor, platform) {
+        if (minor === void 0) { minor = 0; }
+        if (platform === void 0) { platform = defaultPlatform; }
         this.major = 1;
         this.minor = 0;
         this.platform = '';
@@ -19,20 +21,20 @@ class Version {
             this.platform = platform;
         }
     }
-    static createFromString(text) {
-        const match = text.match(advancedPattern);
+    Version.createFromString = function (text) {
+        var match = text.match(advancedPattern);
         if (!match)
             return undefined;
         return new Version(parseInt(match[1]), parseInt(match[2]), match[3] ? match[3] : defaultPlatform);
-    }
-    static createFromSimpleString(text) {
-        const match = text.match(simplePattern);
+    };
+    Version.createFromSimpleString = function (text) {
+        var match = text.match(simplePattern);
         if (!match)
             return undefined;
         return new Version(parseInt(match[1]));
-    }
-    createFromStringOld(text) {
-        const match = text.match(advancedPattern);
+    };
+    Version.prototype.createFromStringOld = function (text) {
+        var match = text.match(advancedPattern);
         if (!match)
             throw new errors_1.Bad_Request('Invalid version format: ' + text);
         this.major = parseInt(match[1]);
@@ -40,14 +42,15 @@ class Version {
         this.platform = match[3]
             ? match[3]
             : defaultPlatform;
-    }
-    equals(version) {
+    };
+    Version.prototype.equals = function (version) {
         return this.major == version.major && this.minor == version.minor;
-    }
-    toString() {
+    };
+    Version.prototype.toString = function () {
         return this.major + '.' + this.minor
             + (this.platform && this.platform != 'none' ? '.' + this.platform : '');
-    }
-}
+    };
+    return Version;
+}());
 exports.Version = Version;
 //# sourceMappingURL=version.js.map

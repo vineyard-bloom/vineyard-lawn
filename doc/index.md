@@ -1,7 +1,6 @@
 # Vineyard Lawn - Documentation
 
-Lawn endpoint construction is divided into a higher level Server class, and a lower level collection of functions that the Server class uses.
+Lawn provides an API for endpoint construction and an optional Server class to launch an HTTP server for those endpoints.
 
-* [Server Class](server.md)
 * [Function API](api.md)
-
+* [Server Class](server.md)

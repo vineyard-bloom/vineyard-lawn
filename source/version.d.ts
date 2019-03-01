@@ -4,7 +4,7 @@ export declare class Version {
     platform: string;
     static createFromString(text: string): Version | undefined;
     static createFromSimpleString(text: string): Version | undefined;
-    private createFromStringOld;
+    private createFromStringOld(text);
     constructor(majorOrString: number | string, minor?: number, platform?: string);
     equals(version: Version): boolean;
     toString(): string;
