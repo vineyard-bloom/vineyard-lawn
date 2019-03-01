@@ -7,7 +7,6 @@ Most tools used to create web services are designed primarily to serve HTML page
 * Consistent use of JSON.  Lawn will never return an HTML response.
 * A single point in code that sends HTTP responses.
 * All endpoint handlers either return a promise or throw an error.
-* Automatic merging of query and post data.
 * Simplified request objects that only contain the essentials for standard endpoint logic.
 * Merging of POST data and query parameters.
 * Built-in support for JSON Schema validation.
