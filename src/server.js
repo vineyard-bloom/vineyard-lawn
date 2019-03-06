@@ -4,56 +4,12 @@ const express = require("express");
 const api_1 = require("./api");
 class Server {
     /**
-     * @param defaultPreprocessor  Deprecated
      * @param requestListener   Callback fired any time a request is received
      */
-    constructor(defaultPreprocessor, requestListener) {
+    constructor(requestListener) {
         this.port = 3000;
         this.app = express();
-        this.default_preprocessor = defaultPreprocessor;
         this.requestListener = requestListener;
-        // Backwards compatibility
-        const self = this;
-        self.get_app = this.getApp;
-        self.get_port = this.getPort;
-        self.enable_cors = this.enableCors;
-        self.add_endpoints = (endpoints, preprocessor) => {
-            api_1.createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
-        };
-    }
-    checkAjv() {
-        if (!this.ajv) {
-            const Ajv = require('ajv');
-            this.ajv = new Ajv({ allErrors: true });
-        }
-    }
-    /**
-     * Compiles an API vaidation schema using ajv.
-     */
-    compileApiSchema(schema) {
-        this.checkAjv();
-        const result = {};
-        for (let i in schema) {
-            const entry = schema[i];
-            if (entry.additionalProperties !== true && entry.additionalProperties !== false)
-                entry.additionalProperties = false;
-            result[i] = this.ajv.compile(schema[i]);
-        }
-        return result;
-    }
-    /**
-     * Adds an API validation schema to the Server's ajv instance.
-     */
-    addApiSchemaHelper(schema) {
-        this.checkAjv();
-        this.ajv.addSchema(schema);
-    }
-    /**
-     * Returns the Server's ajv instance.
-     */
-    getApiSchema() {
-        this.checkAjv();
-        return this.ajv;
     }
     /**
      * Main function to create one or more endpoints.
@@ -64,7 +20,7 @@ class Server {
      *
      */
     createEndpoints(preprocessor, endpoints) {
-        api_1.createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener);
+        api_1.createEndpoints(this.app, endpoints, preprocessor, this.requestListener);
     }
     /**
      * Enables wildcard CORS for this server.
@@ -82,9 +38,9 @@ class Server {
      */
     start(config) {
         this.port = (config && config.port) || 3000;
-        return start_express(this.app, this.port, config.ssl || {})
+        return startExpress(this.app, this.port, config.ssl || {})
             .then(server => {
-            this.node_server = server;
+            this.nodeServer = server;
             console.log('Listening on port ' + this.port + '.');
         });
     }
@@ -105,12 +61,12 @@ class Server {
      */
     stop() {
         return new Promise((resolve, reject) => {
-            this.node_server.close(() => resolve());
+            this.nodeServer.close(() => resolve());
         });
     }
 }
 exports.Server = Server;
-function start_express(app, port, ssl) {
+function startExpress(app, port, ssl) {
     return new Promise((resolve, reject) => {
         try {
             if (ssl.enabled) {
@@ -150,5 +106,5 @@ function start_express(app, port, ssl) {
         }
     });
 }
-exports.start_express = start_express;
+exports.startExpress = startExpress;
 //# sourceMappingURL=server.js.map

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es6",
+    "target": "ES2017",
     "strict": true,
     "sourceMap": true,
     "declaration": true,
@@ -9,7 +9,7 @@
   },
   "include": [
     "./lab/**/*",
-    "./source/**/*",
+    "./src/**/*",
     "./test/**/*"
   ]
 }

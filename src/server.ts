@@ -1,6 +1,6 @@
 import * as express from "express"
 import {createEndpoints} from "./api"
-import {EndpointInfo, RequestListener, RequestProcessor, ValidationCompiler} from "./types"
+import {EndpointInfo, RequestListener, DeferredRequestTransform} from "./types"
 
 export interface SSLConfig {
   enabled?: boolean
@@ -13,74 +13,18 @@ export interface ServerConfig {
   ssl?: SSLConfig
 }
 
-export type Server_Config = ServerConfig
-
-export class Server implements ValidationCompiler {
-  private app: any
-  private node_server: any
+export class Server {
+  readonly app: any
+  private nodeServer: any
   private port: number = 3000
-  private default_preprocessor?: RequestProcessor
-  private ajv?: any
-  private requestListener?: RequestListener
+  readonly requestListener?: RequestListener
 
   /**
-   * @param defaultPreprocessor  Deprecated
    * @param requestListener   Callback fired any time a request is received
    */
-  constructor(defaultPreprocessor?: RequestProcessor, requestListener?: RequestListener) {
+  constructor(requestListener?: RequestListener) {
     this.app = express()
-    this.default_preprocessor = defaultPreprocessor
     this.requestListener = requestListener
-
-    // Backwards compatibility
-    const self: any = this
-    self.get_app = this.getApp
-    self.get_port = this.getPort
-    self.enable_cors = this.enableCors
-    self.add_endpoints = (endpoints: EndpointInfo[], preprocessor: RequestProcessor) => {
-      createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
-    }
-  }
-
-  private checkAjv() {
-    if (!this.ajv) {
-      const Ajv = require('ajv')
-      this.ajv = new Ajv({allErrors: true})
-    }
-  }
-
-  /**
-   * Compiles an API vaidation schema using ajv.
-   */
-  compileApiSchema(schema: any) {
-    this.checkAjv()
-
-    const result: any = {}
-    for (let i in schema) {
-      const entry = schema[i]
-      if (entry.additionalProperties !== true && entry.additionalProperties !== false)
-        entry.additionalProperties = false
-
-      result [i] = this.ajv.compile(schema[i])
-    }
-
-    return result
-  }
-
-  /**
-   * Adds an API validation schema to the Server's ajv instance.
-   */
-  addApiSchemaHelper(schema: any) {
-    this.checkAjv()
-    this.ajv.addSchema(schema)
-  }
-
-  /**
-   * Returns the Server's ajv instance.
-   */
-  getApiSchema() {
-    this.checkAjv()
-    return this.ajv
   }
 
   /**
@@ -91,8 +35,8 @@ export class Server implements ValidationCompiler {
    * @param endpoints  Array of endpoint definitions
    *
    */
-  createEndpoints(preprocessor: RequestProcessor, endpoints: EndpointInfo[]) {
-    createEndpoints(this.app, endpoints, preprocessor, this.ajv, this.requestListener)
+  createEndpoints(preprocessor: DeferredRequestTransform, endpoints: EndpointInfo[]) {
+    createEndpoints(this.app, endpoints, preprocessor, this.requestListener)
   }
 
   /**
@@ -110,11 +54,11 @@ export class Server implements ValidationCompiler {
   /**
    * Starts listening for HTTP requests.
    */
-  start(config: Server_Config): Promise<void> {
+  start(config: ServerConfig): Promise<void> {
     this.port = (config && config.port) || 3000
-    return start_express(this.app, this.port, config.ssl || {})
+    return startExpress(this.app, this.port, config.ssl || {})
       .then(server => {
-        this.node_server = server
+        this.nodeServer = server
         console.log('Listening on port ' + this.port + '.')
       })
   }
@@ -138,12 +82,12 @@ export class Server implements ValidationCompiler {
    */
   stop(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.node_server.close(() => resolve())
+      this.nodeServer.close(() => resolve())
     })
   }
 }
 
-export function start_express(app: express.Application, port: number, ssl: SSLConfig): Promise<any> {
+export function startExpress(app: express.Application, port: number, ssl: SSLConfig): Promise<any> {
   return new Promise<any>((resolve, reject) => {
     try {
       if (ssl.enabled) {

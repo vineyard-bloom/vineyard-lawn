@@ -7,6 +7,5 @@ __export(require("./api"));
 __export(require("./errors"));
 __export(require("./server"));
 __export(require("./types"));
-__export(require("./version"));
-__export(require("./version-preprocessor"));
+__export(require("./versioning"));
 //# sourceMappingURL=index.js.map

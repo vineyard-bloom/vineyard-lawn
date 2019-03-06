@@ -1,21 +1,12 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const version_preprocessor_1 = require("../../source/version-preprocessor");
 const lab_1 = require("../../lab");
 const webClient = new lab_1.WebClient('http://localhost:3000');
 require('source-map-support').install();
 const assert = require("assert");
-const server_1 = require("../../source/server");
-const index_1 = require("../../source/index");
-const version_1 = require("../../source/version");
+const server_1 = require("../../src/server");
+const index_1 = require("../../src/index");
+const versioning_1 = require("../../src/versioning");
 const axios = require('axios').default;
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 const tough = require('tough-cookie');
@@ -26,7 +17,7 @@ axios.defaults.withCredentials = true;
 describe('validation test', function () {
     let server;
     this.timeout(5000);
-    function local_request(method, url, data) {
+    function localRequest(method, url, data) {
         return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
@@ -40,30 +31,30 @@ describe('validation test', function () {
             {
                 method: index_1.Method.post,
                 path: "test",
-                action: (request) => Promise.resolve(),
+                handler: (request) => Promise.resolve(),
                 validator: validators.test
             },
         ]);
         return server.start({});
     });
     it('missing required', function () {
-        return local_request('post', 'test')
+        return localRequest('post', 'test')
             .then((result) => {
             assert(false, 'Should have thrown an error');
         })
             .catch((error) => {
-            assert.equal(1, error.response.data.errors.length);
-            assert.equal('Missing property "weapon"', error.response.data.errors[0]);
+            assert.strictEqual(1, error.response.data.errors.length);
+            assert.strictEqual('Missing property "weapon"', error.response.data.errors[0]);
         });
     });
     it('wrong property type', function () {
-        return local_request('post', 'test', { weapon: 640 })
+        return localRequest('post', 'test', { weapon: 640 })
             .then((result) => {
             assert(false, 'Should have thrown an error');
         })
             .catch((error) => {
-            assert.equal(1, error.response.data.errors.length);
-            assert.equal('Property "weapon" should be a string', error.response.data.errors[0]);
+            assert.strictEqual(1, error.response.data.errors.length);
+            assert.strictEqual('Property "weapon" should be a string', error.response.data.errors[0]);
         });
     });
     after(function () {
@@ -73,36 +64,32 @@ describe('validation test', function () {
 describe('versioning test', function () {
     let server;
     this.timeout(9000);
-    function local_request(method, url, data) {
+    function localRequest(method, url, data) {
         return axios.request({
             url: "http://localhost:3000/" + url,
             method: method,
             data: data
         });
     }
-    it('simple version', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            server = new server_1.Server();
-            const validators = server.compileApiSchema(require('../source/api.json'));
-            const versionPreprocessor = new version_preprocessor_1.VersionPreprocessor([new version_1.Version(1)]);
-            server.createEndpoints((r) => versionPreprocessor.simpleVersion(r), [
-                {
-                    method: index_1.Method.post,
-                    path: "test",
-                    action: (request) => Promise.resolve({ message: 'success' }),
-                    validator: validators.none
-                },
-            ]);
-            yield server.start({});
-            const result = yield local_request('post', 'v1/test');
-            assert.equal(result.data.message, 'success');
-        });
+    it('simple version', async function () {
+        server = new server_1.Server();
+        const validators = server.compileApiSchema(require('../source/api.json'));
+        const versionPreprocessor = index_1.versionRequestTransform([new versioning_1.Version(1)]);
+        server.createEndpoints((r) => versionPreprocessor(r), [
+            {
+                method: index_1.Method.post,
+                path: "test",
+                handler: (request) => Promise.resolve({ message: 'success' }),
+                validator: validators.none
+            },
+        ]);
+        await server.start({});
+        const result = await localRequest('post', 'v1/test');
+        assert.strictEqual(result.data.message, 'success');
     });
-    it('creates jar for cookies', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            let result = yield local_request('post', 'v1/test');
-            assert(result.config.jar);
-        });
+    it('creates jar for cookies', async function () {
+        let result = await localRequest('post', 'v1/test');
+        assert(result.config.jar);
     });
     after(function () {
         return server.stop();
@@ -111,20 +98,20 @@ describe('versioning test', function () {
 describe('versioning-test', function () {
     it('version parsing', function () {
         {
-            const version = new version_1.Version(1);
-            assert.equal(version.major, 1);
-            assert.equal(version.minor, 0);
-            assert.equal(version.platform, 'none');
+            const version = new versioning_1.Version(1);
+            assert.strictEqual(version.major, 1);
+            assert.strictEqual(version.minor, 0);
+            assert.strictEqual(version.platform, 'none');
         }
         {
-            const version = new version_1.Version('1');
-            assert.equal(version.major, 1);
+            const version = new versioning_1.Version(1);
+            assert.strictEqual(version.major, 1);
         }
         {
-            const version = new version_1.Version('1.2.beta');
-            assert.equal(version.major, 1);
-            assert.equal(version.minor, 2);
-            assert.equal(version.platform, 'beta');
+            const version = versioning_1.Version.fromString('v1');
+            assert.strictEqual(version.major, 1);
+            assert.strictEqual(version.minor, 0);
+            assert.strictEqual(version.platform, 'none');
         }
     });
 });
@@ -137,50 +124,42 @@ describe('API call test', function () {
             {
                 method: index_1.Method.get,
                 path: "test",
-                action: (request) => Promise.resolve({ data: 'Test data' })
+                handler: (request) => Promise.resolve({ data: 'Test data' })
             },
             {
                 method: index_1.Method.get,
                 path: "params",
                 params: { name: 'Jane' },
-                action: (request) => Promise.resolve({ data: 'Jane data' })
+                handler: (request) => Promise.resolve({ data: 'Jane data' })
             },
             {
                 method: index_1.Method.post,
                 path: "test",
-                action: (request) => Promise.resolve({ message: 'post successful' })
+                handler: (request) => Promise.resolve({ message: 'post successful' })
             },
             {
                 method: index_1.Method.patch,
                 path: "test",
-                action: (request) => Promise.resolve({ message: 'success' })
+                handler: (request) => Promise.resolve({ message: 'success' })
             },
         ]);
         return server.start({});
     });
-    it('handles a get request', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield webClient.get('test');
-            assert.deepEqual(result, { data: 'Test data' });
-        });
+    it('handles a get request', async function () {
+        const result = await webClient.get('test');
+        assert.deepStrictEqual(result, { data: 'Test data' });
     });
-    it('handles a post request', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield webClient.post('test', { data: 'New data' });
-            assert.deepEqual(result, { message: 'post successful' });
-        });
+    it('handles a post request', async function () {
+        const result = await webClient.post('test', { data: 'New data' });
+        assert.deepStrictEqual(result, { message: 'post successful' });
     });
-    it('handles a patch request', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield webClient.patch('test', { data: 'Some more data' });
-            assert.deepEqual(result, { message: 'success' });
-        });
+    it('handles a patch request', async function () {
+        const result = await webClient.patch('test', { data: 'Some more data' });
+        assert.deepStrictEqual(result, { message: 'success' });
     });
-    it('adds query string params to URL', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield webClient.get('params', { name: 'Jane' });
-            assert.deepEqual(result, { data: 'Jane data' });
-        });
+    it('adds query string params to URL', async function () {
+        const result = await webClient.get('params', { name: 'Jane' });
+        assert.deepStrictEqual(result, { data: 'Jane data' });
     });
     after(function () {
         return server.stop();
