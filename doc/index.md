@@ -2,6 +2,8 @@
 
 ## Example Usage
 
+Normally it is recommended to put handler functions in a separate file.  In this example handler functions are inlined for brevity.
+
     import * as express from 'express'
     import {
       applyVersioning,
@@ -10,17 +12,18 @@
       deferTransform,
       defineEndpoints,
       enableCors,
+      Endpoint,
       LawnRequest,
       Method,
       pipeAsync,
       startExpress
     } from 'vineyard-lawn'
-
+    
     async function authorize(request: LawnRequest) {
       ...
     }
     
-    function initializeEndpoints() {
+    function initializeEndpoints(): Endpoint[] {
     
       const commonTransform = deferTransform(applyVersioning([1]))
       const privateTransform = pipeAsync([commonTransform, authorize])
