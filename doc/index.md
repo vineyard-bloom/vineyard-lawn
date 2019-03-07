@@ -63,7 +63,7 @@ async function main() {
   const endpoints = initializeEndpoints()
   const app = express()
   enableCors(app)   
-  createEndpoints(app, allEndpoints)
+  createEndpoints(app, endpoints)
   
   const config = require('../config/config.json')      
   const server = await startExpress(app, config.api)
