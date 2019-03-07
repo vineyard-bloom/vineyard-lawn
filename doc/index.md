@@ -4,71 +4,73 @@
 
 Normally it is recommended to put handler functions in a separate file.  In this example handler functions are inlined for brevity.
 
-    import * as express from 'express'
-    import {
-      applyVersioning,
-      BadRequest,
-      createEndpoints,
-      deferTransform,
-      defineEndpoints,
-      enableCors,
-      Endpoint,
-      LawnRequest,
-      Method,
-      pipeAsync,
-      startExpress
-    } from 'vineyard-lawn'
-    
-    async function authorize(request: LawnRequest) {
-      ...
-    }
-    
-    function initializeEndpoints(): Endpoint[] {
-    
-      const commonTransform = deferTransform(applyVersioning([1]))
-      const privateTransform = pipeAsync([commonTransform, authorize])
+```typescript
+import * as express from 'express'
+import {
+  applyVersioning,
+  BadRequest,
+  createEndpoints,
+  deferTransform,
+  defineEndpoints,
+  enableCors,
+  Endpoint,
+  LawnRequest,
+  Method,
+  pipeAsync,
+  startExpress
+} from 'vineyard-lawn'
+
+async function authorize(request: LawnRequest) {
+  ...
+}
+
+function initializeEndpoints(): Endpoint[] {
+
+  const commonTransform = deferTransform(applyVersioning([1]))
+  const privateTransform = pipeAsync([commonTransform, authorize])
+
+  const publicEndpoints = defineEndpoints(commonTransform, [
+    {
+      method: Method.get,
+      path: "adventure",
+      handler: async request => ({ someData: 'blah' })
+    },
+    {
+      method: Method.post,
+      path: "adventure",
+      handler: request => {
+        if (!request.data.page)
+          throw new BadRequest("Missing 'page' argument.")
+
+        return { someData: 'page blah' }
+      }
+    },
+  ])
   
-      const publicEndpoints = defineEndpoints(commonTransform, [
-        {
-          method: Method.get,
-          path: "adventure",
-          handler: async request => ({ someData: 'blah' })
-        },
-        {
-          method: Method.post,
-          path: "adventure",
-          handler: request => {
-            if (!request.data.page)
-              throw new BadRequest("Missing 'page' argument.")
+  const privateEndpoints = defineEndpoints(privateTransform, [
+    {
+      method: Method.get,
+      path: "top/secret",
+      handler: request => ({ secretData: 'more blah' })
+    },
+  ])
   
-            return { someData: 'page blah' }
-          }
-        },
-      ])
-      
-      const privateEndpoints = defineEndpoints(privateTransform, [
-        {
-          method: Method.get,
-          path: "top/secret",
-          handler: request => ({ secretData: 'more blah' })
-        },
-      ])
-      
-      return publicEndpoints.concat(privateEndpoints)
-    }
-    
-    async function main() {
-    
-      const endpoints = initializeEndpoints()
-      const app = express()
-      enableCors(app)   
-      createEndpoints(app, allEndpoints)
-      
-      const config = require('../config/config.json')      
-      const server = await startExpress(app, config.api)
-    }
-    
-    main()
+  return publicEndpoints.concat(privateEndpoints)
+}
+
+async function main() {
+
+  const endpoints = initializeEndpoints()
+  const app = express()
+  enableCors(app)   
+  createEndpoints(app, allEndpoints)
+  
+  const config = require('../config/config.json')      
+  const server = await startExpress(app, config.api)
+}
+
+main()
+```
 
 ## Endpoint Data Types
 
