@@ -36,7 +36,7 @@ export interface RequestListener {
   onError(error: Error, request?: LawnRequest): PromiseOrVoid
 }
 
-export interface EndpointInfo {
+export interface Endpoint {
 
   /** HTTP Method */
   method: Method
@@ -50,6 +50,6 @@ export interface EndpointInfo {
   /** Array of Express middleware to use just for this endpoint */
   middleware?: any[]
 
-  /** Callback that is fired whenever a request sends a response */
+  /** Optional callback that is fired when the endpoint sends a response */
   onResponse?: RequestListener
 }

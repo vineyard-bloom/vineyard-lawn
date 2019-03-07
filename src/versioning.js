@@ -55,12 +55,12 @@ function checkVersion(request, versions) {
         throw new errors_1.BadRequest('Unsupported version number');
 }
 exports.checkVersion = checkVersion;
-function versionRequestTransform(versions) {
+function applyVersioning(versions) {
     return request => {
         request.version = getSimpleVersion(request.original, request.data);
         checkVersion(request, versions.map(v => new Version(v)));
         return request;
     };
 }
-exports.versionRequestTransform = versionRequestTransform;
+exports.applyVersioning = applyVersioning;
 //# sourceMappingURL=versioning.js.map

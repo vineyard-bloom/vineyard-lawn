@@ -2,14 +2,15 @@ import * as express from 'express'
 import { handleError, HttpError } from './errors'
 import { Version } from './versioning'
 import {
-  EndpointInfo,
+  DeferredRequestTransform,
+  Endpoint,
   LawnHandler,
   LawnRequest,
   Method,
   PromiseOrVoid,
   RequestListener,
-  DeferredRequestTransform,
-  SimpleResponse, RequestTransform
+  RequestTransform,
+  SimpleResponse
 } from './types'
 
 const bodyParser = require('body-parser')
@@ -73,7 +74,7 @@ function logRequest(request: LawnRequest, listener: RequestListener, response: S
   }
 }
 
-export function createExpressHandler(endpoint: EndpointInfo): express.RequestHandler {
+export function createExpressHandler(endpoint: Endpoint): express.RequestHandler {
   const onResponse = endpoint.onResponse || defaultRequestListener
 
   return async function (req: express.Request, res: express.Response) {
@@ -133,7 +134,7 @@ function registerHttpHandler(app: express.Application, path: string, method: Met
   }
 }
 
-export function attachHandler(app: express.Application, endpoint: EndpointInfo, handler: any) {
+export function attachHandler(app: express.Application, endpoint: Endpoint, handler: any) {
   let path = endpoint.path
   if (path [0] != '/')
     path = '/' + path
@@ -143,7 +144,7 @@ export function attachHandler(app: express.Application, endpoint: EndpointInfo, 
   registerHttpHandler(app, '/:version' + path, endpoint.method, handler, middleware)
 }
 
-export const createEndpoint = (app: express.Application) => (endpoint: EndpointInfo) => {
+export const attachEndpoint = (app: express.Application) => (endpoint: Endpoint) => {
   const handler = createExpressHandler(endpoint)
   attachHandler(app, endpoint, handler)
 }
@@ -155,27 +156,48 @@ export const createEndpoint = (app: express.Application) => (endpoint: EndpointI
  * @param endpoints  Array of endpoint definitions to create
  *
  */
-export function createEndpoints(app: express.Application, endpoints: EndpointInfo[]) {
-  endpoints.forEach(createEndpoint(app))
+export function createEndpoints(app: express.Application, endpoints: Endpoint[]) {
+  endpoints.forEach(attachEndpoint(app))
 }
 
-function wrapLawnHandler(preprocessor: RequestTransform, handler: LawnHandler): LawnHandler {
+function wrapLawnHandler(preprocessor: DeferredRequestTransform, handler: LawnHandler): LawnHandler {
   return (request: any) => preprocessor(request).then(request => handler(request))
 }
 
 /**
  *
- * @param preprocessor  A function to be run before the handler
+ * @param requestTransform  A function to be run before the handler
  *
  */
-export const wrapEndpoint = (preprocessor: RequestTransform) => (endpoint: EndpointInfo) =>
-  ({ ...endpoint, handler: wrapLawnHandler(preprocessor, endpoint.handler) })
+export const wrapEndpoint = (requestTransform: DeferredRequestTransform) => (endpoint: Endpoint) =>
+  ({ ...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler) })
 
-export const transformEndpoint = (overrides: Partial<EndpointInfo>) => (endpoint: EndpointInfo) =>
+export function deferTransform(transform: RequestTransform): DeferredRequestTransform {
+  return async request => transform(request)
+}
+
+export const transformEndpoint = (overrides: Partial<Endpoint>) => (endpoint: Endpoint) =>
   ({ ...endpoint, overrides })
 
 export type Transform<T> = (t: T) => T
+export type AsyncTransform<T> = (t: T) => Promise<T>
 
 export function pipe<T>(transforms: Transform<T>[]): Transform<T> {
   return original => transforms.reduce((a, b) => b(a), original)
 }
+
+export function pipeAsync<T>(transforms: AsyncTransform<T>[]): AsyncTransform<T> {
+  if (transforms.length == 0)
+    return async request => request
+
+  return async request => {
+    let result = request
+    for (const transform of transforms) {
+      result = await transform(result)
+    }
+    return result
+  }
+}
+
+export const defineEndpoints = (requestTransform: DeferredRequestTransform, endpoints: Endpoint[]) =>
+  endpoints.map(wrapEndpoint(requestTransform))

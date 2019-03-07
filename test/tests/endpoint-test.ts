@@ -1,5 +1,6 @@
 import {
-  EndpointInfo,
+  deferTransform,
+  defineEndpoints,
   HttpError,
   LawnRequest,
   logErrorToConsole,
@@ -10,8 +11,7 @@ import {
   RequestTransform,
   SimpleResponse,
   transformEndpoint,
-  versionRequestTransform,
-  wrapEndpoint
+  applyVersioning
 } from '../../src'
 
 require('source-map-support').install()
@@ -34,11 +34,11 @@ describe('endpoint test', function () {
     const dummyConversion: RequestTransform = request => ({ ...request, data: { ...request.data, a: 'rabbit' } })
     const dummyConversion2: RequestTransform = request => ({ ...request, data: { ...request.data, b: 'bird' } })
     const preprocessor = pipe([
-      versionRequestTransform([1, 2]),
+      applyVersioning([1, 2]),
       dummyConversion
     ])
 
-    const primaryEndpoints: EndpointInfo[] = [
+    const primaryEndpoints = defineEndpoints(deferTransform(preprocessor), [
       {
         method: Method.get,
         path: 'somewhere',
@@ -49,9 +49,9 @@ describe('endpoint test', function () {
         path: 'somewhere',
         handler: async request => ({})
       }
-    ]
+    ])
 
-    const secondaryEndpoints: EndpointInfo[] = [
+    const secondaryEndpoints = defineEndpoints(deferTransform(pipe([preprocessor, dummyConversion2])), [
       {
         method: Method.get,
         path: 'nowhere',
@@ -62,12 +62,9 @@ describe('endpoint test', function () {
         path: 'elsewhere',
         handler: async request => ({})
       },
-    ]
+    ])
 
-    const endpoints = primaryEndpoints.map(wrapEndpoint(preprocessor))
-      .concat(
-        secondaryEndpoints.map(wrapEndpoint(pipe([preprocessor, dummyConversion2])))
-      )
+    const endpoints = primaryEndpoints.concat(secondaryEndpoints)
       .map(transformEndpoint({ onResponse: new CustomRequestListener() }))
   })
 })

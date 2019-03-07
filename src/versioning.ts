@@ -66,7 +66,7 @@ export function checkVersion(request: LawnRequest, versions: Version[]) {
     throw new BadRequest('Unsupported version number')
 }
 
-export function versionRequestTransform(versions: number[]): RequestTransform {
+export function applyVersioning(versions: number[]): RequestTransform {
   return request => {
     request.version = getSimpleVersion(request.original, request.data)
     checkVersion(request, versions.map(v => new Version(v)))

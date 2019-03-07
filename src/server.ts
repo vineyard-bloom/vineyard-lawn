@@ -1,6 +1,4 @@
 import * as express from "express"
-import {createEndpoints} from "./api"
-import {EndpointInfo, RequestListener, DeferredRequestTransform} from "./types"
 
 export interface SSLConfig {
   enabled?: boolean
@@ -8,89 +6,26 @@ export interface SSLConfig {
   privateFile?: string
 }
 
-export interface ServerConfig {
+export interface ApiConfig {
   port?: number
   ssl?: SSLConfig
 }
 
-export class Server {
-  readonly app: any
-  private nodeServer: any
-  private port: number = 3000
-  readonly requestListener?: RequestListener
-
-  /**
-   * @param requestListener   Callback fired any time a request is received
-   */
-  constructor(requestListener?: RequestListener) {
-    this.app = express()
-    this.requestListener = requestListener
-  }
-
-  /**
-   * Main function to create one or more endpoints.
-   *
-   * @param preprocessor  Function to call before each endpoint handler
-   *
-   * @param endpoints  Array of endpoint definitions
-   *
-   */
-  createEndpoints(preprocessor: DeferredRequestTransform, endpoints: EndpointInfo[]) {
-    createEndpoints(this.app, endpoints, preprocessor, this.requestListener)
-  }
-
-  /**
-   * Enables wildcard CORS for this server.
-   */
-  enableCors() {
-    this.app.use(require('cors')({
-      origin: function (origin: any, callback: any) {
-        callback(undefined, true)
-      },
-      credentials: true
-    }))
-  }
-
-  /**
-   * Starts listening for HTTP requests.
-   */
-  start(config: ServerConfig): Promise<void> {
-    this.port = (config && config.port) || 3000
-    return startExpress(this.app, this.port, config.ssl || {})
-      .then(server => {
-        this.nodeServer = server
-        console.log('Listening on port ' + this.port + '.')
-      })
-  }
-
-  /**
-   * Gets the Server's internal Express app.
-   */
-  getApp() {
-    return this.app
-  }
-
-  /**
-   * Gets the listening HTTP port.
-   */
-  getPort(): number {
-    return this.port
-  }
-
-  /**
-   * Stops the server.
-   */
-  stop(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.nodeServer.close(() => resolve())
-    })
-  }
+export function enableCors(app: express.Application) {
+  app.use(require('cors')({
+    origin: function (origin: any, callback: any) {
+      callback(undefined, true)
+    },
+    credentials: true
+  }))
 }
 
-export function startExpress(app: express.Application, port: number, ssl: SSLConfig): Promise<any> {
+export function startExpress(app: express.Application, config: ApiConfig): Promise<any> {
+  const {ssl} = config
+  const port = config.port || 3000
   return new Promise<any>((resolve, reject) => {
     try {
-      if (ssl.enabled) {
+      if (ssl && ssl.enabled) {
         const https = require('https')
         const fs = require('fs')
         let privateCert, publicCert

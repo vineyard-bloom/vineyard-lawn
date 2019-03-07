@@ -29,7 +29,7 @@ export interface RequestListener {
     onRequest(request: LawnRequest, response: SimpleResponse, req: any): PromiseOrVoid;
     onError(error: Error, request?: LawnRequest): PromiseOrVoid;
 }
-export interface EndpointInfo {
+export interface Endpoint {
     /** HTTP Method */
     method: Method;
     /** Relative endpoint path */
@@ -38,6 +38,6 @@ export interface EndpointInfo {
     handler: LawnHandler;
     /** Array of Express middleware to use just for this endpoint */
     middleware?: any[];
-    /** Callback that is fired whenever a request sends a response */
+    /** Optional callback that is fired when the endpoint sends a response */
     onResponse?: RequestListener;
 }

@@ -9,7 +9,7 @@ Most tools used to create web services are designed primarily to serve HTML page
 * All endpoint handlers either return a promise or throw an error.
 * Simplified request objects that only contain the essentials for standard endpoint logic.
 * Merging of POST data and query parameters.
-* Built-in support for JSON Schema validation.
 * Built-in support for versioning.
+* Common HTTP Error classes
 
 [Documentation](doc/index.md)

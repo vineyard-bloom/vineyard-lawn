@@ -13,4 +13,4 @@ export declare function getRequestVersionString(req: any, data: any): string | u
 export declare function prepareRequestVersionText(req: any, data: any): string;
 export declare function getSimpleVersion(req: express.Request, data: any): Version | undefined;
 export declare function checkVersion(request: LawnRequest, versions: Version[]): void;
-export declare function versionRequestTransform(versions: number[]): RequestTransform;
+export declare function applyVersioning(versions: number[]): RequestTransform;

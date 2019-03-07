@@ -116,7 +116,7 @@ function attachHandler(app, endpoint, handler) {
     registerHttpHandler(app, '/:version' + path, endpoint.method, handler, middleware);
 }
 exports.attachHandler = attachHandler;
-exports.createEndpoint = (app) => (endpoint) => {
+exports.attachEndpoint = (app) => (endpoint) => {
     const handler = createExpressHandler(endpoint);
     attachHandler(app, endpoint, handler);
 };
@@ -128,7 +128,7 @@ exports.createEndpoint = (app) => (endpoint) => {
  *
  */
 function createEndpoints(app, endpoints) {
-    endpoints.forEach(exports.createEndpoint(app));
+    endpoints.forEach(exports.attachEndpoint(app));
 }
 exports.createEndpoints = createEndpoints;
 function wrapLawnHandler(preprocessor, handler) {
@@ -136,13 +136,30 @@ function wrapLawnHandler(preprocessor, handler) {
 }
 /**
  *
- * @param preprocessor  A function to be run before the handler
+ * @param requestTransform  A function to be run before the handler
  *
  */
-exports.wrapEndpoint = (preprocessor) => (endpoint) => (Object.assign({}, endpoint, { handler: wrapLawnHandler(preprocessor, endpoint.handler) }));
+exports.wrapEndpoint = (requestTransform) => (endpoint) => (Object.assign({}, endpoint, { handler: wrapLawnHandler(requestTransform, endpoint.handler) }));
+function deferTransform(transform) {
+    return async (request) => transform(request);
+}
+exports.deferTransform = deferTransform;
 exports.transformEndpoint = (overrides) => (endpoint) => (Object.assign({}, endpoint, { overrides }));
 function pipe(transforms) {
     return original => transforms.reduce((a, b) => b(a), original);
 }
 exports.pipe = pipe;
+function pipeAsync(transforms) {
+    if (transforms.length == 0)
+        return async (request) => request;
+    return async (request) => {
+        let result = request;
+        for (const transform of transforms) {
+            result = await transform(result);
+        }
+        return result;
+    };
+}
+exports.pipeAsync = pipeAsync;
+exports.defineEndpoints = (requestTransform, endpoints) => endpoints.map(exports.wrapEndpoint(requestTransform));
 //# sourceMappingURL=api.js.map
