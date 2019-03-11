@@ -90,7 +90,7 @@ main()
 * middleware `any[]` Array of Express middleware to use just for this endpoint
 * path `string` Relative endpoint path
 * onResponse `RequestListener` Optional callback that is fired when the endpoint sends a response
-
+* validator `any` Optional placeholder for validation data.  Not directly used by Lawn but available for third-party request transforms.
 ## Endpoint Functions
 
 ### defineEndpoints
