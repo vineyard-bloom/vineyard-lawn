@@ -1,6 +1,6 @@
 import * as express from 'express'
-import { handleError, HttpError } from './errors'
-import { Version } from './versioning'
+import {handleError, HttpError} from './errors'
+import {Version} from './versioning'
 import {
   DeferredRequestTransform,
   Endpoint,
@@ -170,14 +170,14 @@ function wrapLawnHandler(preprocessor: DeferredRequestTransform, handler: LawnHa
  *
  */
 export const wrapEndpoint = (requestTransform: DeferredRequestTransform) => (endpoint: Endpoint) =>
-  ({ ...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler) })
+  ({...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler)})
 
-export function deferTransform(transform: RequestTransform): DeferredRequestTransform {
+export function deferTransform<A, B>(transform: (t: A) => B): (t: A) => Promise<B> {
   return async request => transform(request)
 }
 
 export const transformEndpoint = (overrides: Partial<Endpoint>) => (endpoint: Endpoint) =>
-  ({ ...endpoint, overrides })
+  ({...endpoint, overrides})
 
 export type Transform<T> = (t: T) => T
 export type AsyncTransform<T> = (t: T) => Promise<T>

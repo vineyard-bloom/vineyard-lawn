@@ -54,5 +54,5 @@ export interface Endpoint {
   onResponse?: RequestListener
 
   /** Optional placeholder for validation data.  Not directly used by Lawn but available for third-party request transforms. */
-  validator?: any
+  validation?: any
 }
