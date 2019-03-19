@@ -1,7 +1,11 @@
 import * as express from 'express';
 import { HttpError } from './errors';
-import { DeferredRequestTransform, Endpoint, LawnHandler, Method, RequestListener, RequestTransform } from './types';
+import { DeferredRequestTransform, Endpoint, LawnHandler, LawnRequest, Method, PromiseOrVoid, RequestListener, SimpleResponse } from './types';
 export declare function logErrorToConsole(error: HttpError): void;
+export declare class EmptyRequestListener implements RequestListener {
+    onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid;
+    onError(error: HttpError, request?: LawnRequest): PromiseOrVoid;
+}
 export declare function createExpressHandler(endpoint: Endpoint): express.RequestHandler;
 export declare function attachHandler(app: express.Application, endpoint: Endpoint, handler: any): void;
 export declare const attachEndpoint: (app: express.Application) => (endpoint: Endpoint) => void;
@@ -24,8 +28,9 @@ export declare const wrapEndpoint: (requestTransform: DeferredRequestTransform) 
     path: string;
     middleware?: any[] | undefined;
     onResponse?: RequestListener | undefined;
+    validation?: any;
 };
-export declare function deferTransform(transform: RequestTransform): DeferredRequestTransform;
+export declare function deferTransform<A, B>(transform: (t: A) => B): (t: A) => Promise<B>;
 export declare const transformEndpoint: (overrides: Partial<Endpoint>) => (endpoint: Endpoint) => {
     overrides: Partial<Endpoint>;
     method: Method;
@@ -33,6 +38,7 @@ export declare const transformEndpoint: (overrides: Partial<Endpoint>) => (endpo
     handler: LawnHandler;
     middleware?: any[] | undefined;
     onResponse?: RequestListener | undefined;
+    validation?: any;
 };
 export declare type Transform<T> = (t: T) => T;
 export declare type AsyncTransform<T> = (t: T) => Promise<T>;
@@ -44,4 +50,14 @@ export declare const defineEndpoints: (requestTransform: DeferredRequestTransfor
     path: string;
     middleware?: any[] | undefined;
     onResponse?: RequestListener | undefined;
+    validation?: any;
 }[];
+export declare function setEndpointListener(onResponse: RequestListener): (endpoint: Endpoint) => {
+    overrides: Partial<Endpoint>;
+    method: Method;
+    path: string;
+    handler: LawnHandler;
+    middleware?: any[] | undefined;
+    onResponse?: RequestListener | undefined;
+    validation?: any;
+};

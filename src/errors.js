@@ -47,13 +47,12 @@ class Unauthorized extends HTTPError {
 exports.Unauthorized = Unauthorized;
 function sendErrorResponse(res, error) {
     const message = error.message = error.status == 500 ? "Server Error" : error.message;
-    res.statusMessage = message;
     error.body = error.body || {};
     const body = {
         message: error.message,
         errors: error.body.errors
     };
-    res.status(error.status).send(body);
+    res.status(error.status).json(body);
 }
 exports.sendErrorResponse = sendErrorResponse;
 function handleError(res, error, listener, request) {

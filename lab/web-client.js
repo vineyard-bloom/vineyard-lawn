@@ -12,17 +12,19 @@ class WebClient {
         this.url = url;
     }
     async request(method, path, params, data) {
-        return axios.request({
-            method: method,
-            url: this.url + '/' + path,
-            params: params,
-            data: data,
-        })
-            .then((response) => response.data)
-            .catch((error) => {
-            console.log(error);
-            return error;
-        });
+        try {
+            const response = await axios.request({
+                method: method,
+                url: this.url + '/' + path,
+                params: params,
+                data: data,
+            });
+            return response.data;
+        }
+        catch (error) {
+            // console.log(error)
+            return { error };
+        }
     }
     async get(path, params) {
         return this.request('get', path, params, undefined);

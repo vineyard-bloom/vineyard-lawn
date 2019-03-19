@@ -24,6 +24,15 @@ class DefaultRequestListener {
         return;
     }
 }
+class EmptyRequestListener {
+    onRequest(request, response, res) {
+        return;
+    }
+    onError(error, request) {
+        return;
+    }
+}
+exports.EmptyRequestListener = EmptyRequestListener;
 const defaultRequestListener = new DefaultRequestListener();
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function getArguments(req) {
@@ -68,7 +77,7 @@ function createExpressHandler(endpoint) {
         }
         try {
             const content = await endpoint.handler(request);
-            res.send(content);
+            res.json(content);
             logRequest(request, onResponse, {
                 code: 200,
                 message: '',
@@ -162,4 +171,8 @@ function pipeAsync(transforms) {
 }
 exports.pipeAsync = pipeAsync;
 exports.defineEndpoints = (requestTransform, endpoints) => endpoints.map(exports.wrapEndpoint(requestTransform));
+function setEndpointListener(onResponse) {
+    return exports.transformEndpoint({ onResponse });
+}
+exports.setEndpointListener = setEndpointListener;
 //# sourceMappingURL=api.js.map

@@ -1,6 +1,6 @@
 import * as express from 'express'
-import {handleError, HttpError} from './errors'
-import {Version} from './versioning'
+import { handleError, HttpError } from './errors'
+import { Version } from './versioning'
 import {
   DeferredRequestTransform,
   Endpoint,
@@ -9,7 +9,6 @@ import {
   Method,
   PromiseOrVoid,
   RequestListener,
-  RequestTransform,
   SimpleResponse
 } from './types'
 
@@ -35,6 +34,17 @@ class DefaultRequestListener implements RequestListener {
 
   onError(error: HttpError, request?: LawnRequest): PromiseOrVoid {
     logErrorToConsole(error)
+    return
+  }
+}
+
+export class EmptyRequestListener implements RequestListener {
+
+  onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid {
+    return
+  }
+
+  onError(error: HttpError, request?: LawnRequest): PromiseOrVoid {
     return
   }
 }
@@ -90,7 +100,7 @@ export function createExpressHandler(endpoint: Endpoint): express.RequestHandler
 
     try {
       const content = await endpoint.handler(request)
-      res.send(content)
+      res.json(content)
       logRequest(request, onResponse, {
         code: 200,
         message: '',
@@ -170,14 +180,14 @@ function wrapLawnHandler(preprocessor: DeferredRequestTransform, handler: LawnHa
  *
  */
 export const wrapEndpoint = (requestTransform: DeferredRequestTransform) => (endpoint: Endpoint) =>
-  ({...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler)})
+  ({ ...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler) })
 
 export function deferTransform<A, B>(transform: (t: A) => B): (t: A) => Promise<B> {
   return async request => transform(request)
 }
 
 export const transformEndpoint = (overrides: Partial<Endpoint>) => (endpoint: Endpoint) =>
-  ({...endpoint, overrides})
+  ({ ...endpoint, overrides })
 
 export type Transform<T> = (t: T) => T
 export type AsyncTransform<T> = (t: T) => Promise<T>
@@ -201,3 +211,7 @@ export function pipeAsync<T>(transforms: AsyncTransform<T>[]): AsyncTransform<T>
 
 export const defineEndpoints = (requestTransform: DeferredRequestTransform, endpoints: Endpoint[]) =>
   endpoints.map(wrapEndpoint(requestTransform))
+
+export function setEndpointListener(onResponse: RequestListener) {
+  return transformEndpoint({ onResponse })
+}

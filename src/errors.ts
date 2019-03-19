@@ -63,14 +63,13 @@ export class Unauthorized extends HTTPError {
 
 export function sendErrorResponse(res: any, error: HttpError) {
   const message = error.message = error.status == 500 ? "Server Error" : error.message
-  res.statusMessage = message
   error.body = error.body || {}
   const body: any = {
     message: error.message,
     errors: error.body.errors
   }
 
-  res.status(error.status).send(body)
+  res.status(error.status).json(body)
 }
 
 export function handleError(res: any, error: HttpError, listener: RequestListener, request?: LawnRequest) {

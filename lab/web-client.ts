@@ -16,17 +16,18 @@ export class WebClient {
   }
 
   private async request(method: string, path: string, params?: { [queryParameter: string]: any }, data?: any): Promise<any> {
-    return axios.request({
-      method: method,
-      url: this.url + '/' + path,
-      params: params,
-      data: data,
-    })
-      .then((response: any) => response.data)
-      .catch((error: any) => {
-        console.log(error)
-        return error
+    try {
+      const response = await axios.request({
+        method: method,
+        url: this.url + '/' + path,
+        params: params,
+        data: data,
       })
+      return response.data
+    } catch (error) {
+      // console.log(error)
+      return { error }
+    }
   }
 
   async get(path: string, params?: any): Promise<any> {
