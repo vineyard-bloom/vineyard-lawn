@@ -18,6 +18,7 @@ class WebClient {
                 url: this.url + '/' + path,
                 params: params,
                 data: data,
+                validateStatus: (status) => status < 500
             });
             return response.data;
         }

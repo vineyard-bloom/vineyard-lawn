@@ -22,6 +22,7 @@ export class WebClient {
         url: this.url + '/' + path,
         params: params,
         data: data,
+        validateStatus: (status: number) => status < 500
       })
       return response.data
     } catch (error) {
