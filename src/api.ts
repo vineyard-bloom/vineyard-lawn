@@ -49,7 +49,7 @@ export class EmptyRequestListener implements RequestListener {
   }
 }
 
-const defaultRequestListener = new DefaultRequestListener()
+export const defaultRequestListener = new DefaultRequestListener()
 
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function getArguments(req: express.Request) {
@@ -187,7 +187,7 @@ export function deferTransform<A, B>(transform: (t: A) => B): (t: A) => Promise<
 }
 
 export const transformEndpoint = (overrides: Partial<Endpoint>) => (endpoint: Endpoint) =>
-  ({ ...endpoint, overrides })
+  ({ ...endpoint, ...overrides })
 
 export type Transform<T> = (t: T) => T
 export type AsyncTransform<T> = (t: T) => Promise<T>
@@ -212,6 +212,5 @@ export function pipeAsync<T>(transforms: AsyncTransform<T>[]): AsyncTransform<T>
 export const defineEndpoints = (requestTransform: DeferredRequestTransform, endpoints: Endpoint[]) =>
   endpoints.map(wrapEndpoint(requestTransform))
 
-export function setEndpointListener(onResponse: RequestListener) {
-  return transformEndpoint({ onResponse })
-}
+export const setEndpointListener = (onResponse: RequestListener) =>
+  transformEndpoint({ onResponse })

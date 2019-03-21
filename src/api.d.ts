@@ -2,10 +2,15 @@ import * as express from 'express';
 import { HttpError } from './errors';
 import { DeferredRequestTransform, Endpoint, LawnHandler, LawnRequest, Method, PromiseOrVoid, RequestListener, SimpleResponse } from './types';
 export declare function logErrorToConsole(error: HttpError): void;
+declare class DefaultRequestListener implements RequestListener {
+    onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid;
+    onError(error: HttpError, request?: LawnRequest): PromiseOrVoid;
+}
 export declare class EmptyRequestListener implements RequestListener {
     onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid;
     onError(error: HttpError, request?: LawnRequest): PromiseOrVoid;
 }
+export declare const defaultRequestListener: DefaultRequestListener;
 export declare function createExpressHandler(endpoint: Endpoint): express.RequestHandler;
 export declare function attachHandler(app: express.Application, endpoint: Endpoint, handler: any): void;
 export declare const attachEndpoint: (app: express.Application) => (endpoint: Endpoint) => void;
@@ -32,7 +37,6 @@ export declare const wrapEndpoint: (requestTransform: DeferredRequestTransform) 
 };
 export declare function deferTransform<A, B>(transform: (t: A) => B): (t: A) => Promise<B>;
 export declare const transformEndpoint: (overrides: Partial<Endpoint>) => (endpoint: Endpoint) => {
-    overrides: Partial<Endpoint>;
     method: Method;
     path: string;
     handler: LawnHandler;
@@ -52,8 +56,7 @@ export declare const defineEndpoints: (requestTransform: DeferredRequestTransfor
     onResponse?: RequestListener | undefined;
     validation?: any;
 }[];
-export declare function setEndpointListener(onResponse: RequestListener): (endpoint: Endpoint) => {
-    overrides: Partial<Endpoint>;
+export declare const setEndpointListener: (onResponse: RequestListener) => (endpoint: Endpoint) => {
     method: Method;
     path: string;
     handler: LawnHandler;
@@ -61,3 +64,4 @@ export declare function setEndpointListener(onResponse: RequestListener): (endpo
     onResponse?: RequestListener | undefined;
     validation?: any;
 };
+export {};

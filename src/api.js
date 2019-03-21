@@ -33,7 +33,7 @@ class EmptyRequestListener {
     }
 }
 exports.EmptyRequestListener = EmptyRequestListener;
-const defaultRequestListener = new DefaultRequestListener();
+exports.defaultRequestListener = new DefaultRequestListener();
 // This function is currently modifying req.body for performance though could be changed if it ever caused problems.
 function getArguments(req) {
     const result = req.body || {};
@@ -64,7 +64,7 @@ function logRequest(request, listener, response, req) {
     }
 }
 function createExpressHandler(endpoint) {
-    const onResponse = endpoint.onResponse || defaultRequestListener;
+    const onResponse = endpoint.onResponse || exports.defaultRequestListener;
     return async function (req, res) {
         let request;
         try {
@@ -153,7 +153,7 @@ function deferTransform(transform) {
     return async (request) => transform(request);
 }
 exports.deferTransform = deferTransform;
-exports.transformEndpoint = (overrides) => (endpoint) => (Object.assign({}, endpoint, { overrides }));
+exports.transformEndpoint = (overrides) => (endpoint) => (Object.assign({}, endpoint, overrides));
 function pipe(transforms) {
     return original => transforms.reduce((a, b) => b(a), original);
 }
@@ -171,8 +171,5 @@ function pipeAsync(transforms) {
 }
 exports.pipeAsync = pipeAsync;
 exports.defineEndpoints = (requestTransform, endpoints) => endpoints.map(exports.wrapEndpoint(requestTransform));
-function setEndpointListener(onResponse) {
-    return exports.transformEndpoint({ onResponse });
-}
-exports.setEndpointListener = setEndpointListener;
+exports.setEndpointListener = (onResponse) => exports.transformEndpoint({ onResponse });
 //# sourceMappingURL=api.js.map
