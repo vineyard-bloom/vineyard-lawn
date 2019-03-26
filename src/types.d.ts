@@ -10,7 +10,6 @@ export declare enum Method {
 export interface LawnRequest {
     data: any;
     session: any;
-    user?: any;
     params?: any;
     version?: Version;
     startTime?: any;
