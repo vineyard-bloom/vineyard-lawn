@@ -57,7 +57,7 @@ export function getSimpleVersion(req: express.Request, data: any): Version | und
   return Version.fromString(text)
 }
 
-export function checkVersion(request: LawnRequest, versions: Version[]) {
+export function checkVersion(request: LawnRequest<any>, versions: Version[]) {
   const version = request.version
   if (!version)
     throw new BadRequest('Missing version property.')
@@ -66,7 +66,7 @@ export function checkVersion(request: LawnRequest, versions: Version[]) {
     throw new BadRequest('Unsupported version number')
 }
 
-export function applyVersioning(versions: number[]): RequestTransform {
+export function applyVersioning<T>(versions: number[]): RequestTransform<T> {
   return request => {
     request.version = getSimpleVersion(request.original, request.data)
     checkVersion(request, versions.map(v => new Version(v)))

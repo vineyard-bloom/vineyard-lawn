@@ -26,4 +26,4 @@ export declare class Unauthorized extends HTTPError {
     constructor(message?: string);
 }
 export declare function sendErrorResponse(res: any, error: HttpError): void;
-export declare function handleError(res: any, error: HttpError, listener: RequestListener, request?: LawnRequest): void;
+export declare function handleError(res: any, error: HttpError, listener: RequestListener, request?: LawnRequest<any>): void;

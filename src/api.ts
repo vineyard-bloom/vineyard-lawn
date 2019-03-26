@@ -28,11 +28,11 @@ export function logErrorToConsole(error: HttpError) {
 
 class DefaultRequestListener implements RequestListener {
 
-  onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid {
+  onRequest(request: LawnRequest<any>, response: SimpleResponse, res: any): PromiseOrVoid {
     return
   }
 
-  onError(error: HttpError, request?: LawnRequest): PromiseOrVoid {
+  onError(error: HttpError, request?: LawnRequest<any>): PromiseOrVoid {
     logErrorToConsole(error)
     return
   }
@@ -40,11 +40,11 @@ class DefaultRequestListener implements RequestListener {
 
 export class EmptyRequestListener implements RequestListener {
 
-  onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid {
+  onRequest(request: LawnRequest<any>, response: SimpleResponse, res: any): PromiseOrVoid {
     return
   }
 
-  onError(error: HttpError, request?: LawnRequest): PromiseOrVoid {
+  onError(error: HttpError, request?: LawnRequest<any>): PromiseOrVoid {
     return
   }
 }
@@ -60,12 +60,11 @@ function getArguments(req: express.Request) {
   return result
 }
 
-function formatRequest(req: express.Request): LawnRequest {
+function formatRequest(req: express.Request): LawnRequest<any> {
   const data = getArguments(req)
 
-  const request: LawnRequest = {
+  const request: LawnRequest<any> = {
     data: data,
-    session: req.session,
     version: undefined,
     original: req,
     startTime: new Date().getTime()
@@ -76,7 +75,7 @@ function formatRequest(req: express.Request): LawnRequest {
   return request
 }
 
-function logRequest(request: LawnRequest, listener: RequestListener, response: SimpleResponse, req: express.Request) {
+function logRequest(request: LawnRequest<any>, listener: RequestListener, response: SimpleResponse, req: express.Request) {
   try {
     listener.onRequest(request, response, req)
   } catch (error) {
@@ -170,17 +169,14 @@ export function createEndpoints(app: express.Application, endpoints: Endpoint[])
   endpoints.forEach(attachEndpoint(app))
 }
 
-function wrapLawnHandler(preprocessor: DeferredRequestTransform, handler: LawnHandler): LawnHandler {
+function wrapLawnHandler<T>(preprocessor: DeferredRequestTransform<T>, handler: LawnHandler<T>): LawnHandler<T> {
   return (request: any) => preprocessor(request).then(request => handler(request))
 }
 
-/**
- *
- * @param requestTransform  A function to be run before the handler
- *
- */
-export const wrapEndpoint = (requestTransform: DeferredRequestTransform) => (endpoint: Endpoint) =>
-  ({ ...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler) })
+export function wrapEndpoint<T>(requestTransform: DeferredRequestTransform<T>): (e: Endpoint) => Endpoint {
+  return (endpoint: Endpoint) =>
+    ({ ...endpoint, handler: wrapLawnHandler(requestTransform, endpoint.handler) })
+}
 
 export function deferTransform<A, B>(transform: (t: A) => B): (t: A) => Promise<B> {
   return async request => transform(request)
@@ -209,7 +205,7 @@ export function pipeAsync<T>(transforms: AsyncTransform<T>[]): AsyncTransform<T>
   }
 }
 
-export const defineEndpoints = (requestTransform: DeferredRequestTransform, endpoints: Endpoint[]) =>
+export const defineEndpoints = (requestTransform: DeferredRequestTransform<any>, endpoints: Endpoint[]) =>
   endpoints.map(wrapEndpoint(requestTransform))
 
 export const setEndpointListener = (onResponse: RequestListener) =>

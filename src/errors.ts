@@ -70,7 +70,7 @@ export function sendErrorResponse(res: any, error: HttpError) {
   res.status(error.status).json(body)
 }
 
-export function handleError(res: any, error: HttpError, listener: RequestListener, request?: LawnRequest) {
+export function handleError(res: any, error: HttpError, listener: RequestListener, request?: LawnRequest<any>) {
   error.status = error.status || 500
 
   try {

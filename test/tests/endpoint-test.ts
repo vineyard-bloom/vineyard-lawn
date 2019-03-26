@@ -18,11 +18,11 @@ require('source-map-support').install()
 
 class CustomRequestListener implements RequestListener {
 
-  onRequest(request: LawnRequest, response: SimpleResponse, res: any): PromiseOrVoid {
+  onRequest(request: LawnRequest<any>, response: SimpleResponse, res: any): PromiseOrVoid {
     return
   }
 
-  onError(error: HttpError, request?: LawnRequest): PromiseOrVoid {
+  onError(error: HttpError, request?: LawnRequest<any>): PromiseOrVoid {
     logErrorToConsole(error)
     return
   }
@@ -31,8 +31,8 @@ class CustomRequestListener implements RequestListener {
 describe('endpoint test', function () {
 
   it('can define endpoints', function () {
-    const dummyConversion: RequestTransform = request => ({ ...request, data: { ...request.data, a: 'rabbit' } })
-    const dummyConversion2: RequestTransform = request => ({ ...request, data: { ...request.data, b: 'bird' } })
+    const dummyConversion: RequestTransform<any> = request => ({ ...request, data: { ...request.data, a: 'rabbit' } })
+    const dummyConversion2: RequestTransform<any> = request => ({ ...request, data: { ...request.data, b: 'bird' } })
     const preprocessor = pipe([
       applyVersioning([1, 2]),
       dummyConversion

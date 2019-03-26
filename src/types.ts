@@ -9,9 +9,8 @@ export enum Method {
   delete
 }
 
-export interface LawnRequest {
-  data: any
-  session: any
+export interface LawnRequest<T> {
+  data: T
   params?: any
   version?: Version
   startTime?: any
@@ -19,9 +18,9 @@ export interface LawnRequest {
 }
 
 export type PromiseOrVoid = Promise<void> | void
-export type DeferredRequestTransform = (request: LawnRequest) => Promise<LawnRequest>
-export type RequestTransform = (request: LawnRequest) => LawnRequest
-export type LawnHandler = (request: LawnRequest) => Promise<any>
+export type DeferredRequestTransform<T> = (request: LawnRequest<T>) => Promise<LawnRequest<T>>
+export type RequestTransform<T> = (request: LawnRequest<T>) => LawnRequest<T>
+export type LawnHandler<T> = (request: LawnRequest<T>) => Promise<any>
 
 export interface SimpleResponse {
   code: number
@@ -30,9 +29,9 @@ export interface SimpleResponse {
 }
 
 export interface RequestListener {
-  onRequest(request: LawnRequest, response: SimpleResponse, req: any): PromiseOrVoid
+  onRequest(request: LawnRequest<any>, response: SimpleResponse, req: any): PromiseOrVoid
 
-  onError(error: Error, request?: LawnRequest): PromiseOrVoid
+  onError(error: Error, request?: LawnRequest<any>): PromiseOrVoid
 }
 
 export interface Endpoint {
@@ -44,7 +43,7 @@ export interface Endpoint {
   path: string
 
   /** Request handler function */
-  handler: LawnHandler
+  handler: LawnHandler<any>
 
   /** Array of Express middleware to use just for this endpoint */
   middleware?: any[]

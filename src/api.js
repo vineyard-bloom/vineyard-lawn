@@ -46,7 +46,6 @@ function formatRequest(req) {
     const data = getArguments(req);
     const request = {
         data: data,
-        session: req.session,
         version: undefined,
         original: req,
         startTime: new Date().getTime()
@@ -143,12 +142,10 @@ exports.createEndpoints = createEndpoints;
 function wrapLawnHandler(preprocessor, handler) {
     return (request) => preprocessor(request).then(request => handler(request));
 }
-/**
- *
- * @param requestTransform  A function to be run before the handler
- *
- */
-exports.wrapEndpoint = (requestTransform) => (endpoint) => (Object.assign({}, endpoint, { handler: wrapLawnHandler(requestTransform, endpoint.handler) }));
+function wrapEndpoint(requestTransform) {
+    return (endpoint) => (Object.assign({}, endpoint, { handler: wrapLawnHandler(requestTransform, endpoint.handler) }));
+}
+exports.wrapEndpoint = wrapEndpoint;
 function deferTransform(transform) {
     return async (request) => transform(request);
 }
@@ -170,6 +167,6 @@ function pipeAsync(transforms) {
     };
 }
 exports.pipeAsync = pipeAsync;
-exports.defineEndpoints = (requestTransform, endpoints) => endpoints.map(exports.wrapEndpoint(requestTransform));
+exports.defineEndpoints = (requestTransform, endpoints) => endpoints.map(wrapEndpoint(requestTransform));
 exports.setEndpointListener = (onResponse) => exports.transformEndpoint({ onResponse });
 //# sourceMappingURL=api.js.map
