@@ -5,3 +5,4 @@ npm-*
 yarn*
 test/**/*.d.ts
 test/**/*.js*
+dist-intermediate
