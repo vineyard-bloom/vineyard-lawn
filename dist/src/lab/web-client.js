@@ -39,6 +39,9 @@ class WebClient {
     async patch(path, data) {
         return this.request('patch', path, undefined, data);
     }
+    async delete(path) {
+        return this.request('delete', path, undefined);
+    }
 }
 exports.WebClient = WebClient;
 //# sourceMappingURL=web-client.js.map

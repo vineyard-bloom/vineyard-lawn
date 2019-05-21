@@ -6,4 +6,5 @@ export declare class WebClient {
     post(path: string, data?: any): Promise<any>;
     put(path: string, data: any): Promise<any>;
     patch(path: string, data: any): Promise<any>;
+    delete(path: string): Promise<any>;
 }

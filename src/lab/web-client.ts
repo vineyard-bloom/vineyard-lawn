@@ -27,7 +27,7 @@ export class WebClient {
       return response.data
     } catch (error) {
       // console.log(error)
-      return { error }
+      return {error}
     }
   }
 
@@ -45,6 +45,10 @@ export class WebClient {
 
   async patch(path: string, data: any): Promise<any> {
     return this.request('patch', path, undefined, data)
+  }
+
+  async delete(path: string): Promise<any> {
+    return this.request('delete', path, undefined)
   }
 
 }
