@@ -18,7 +18,7 @@ class WebClient {
                 url: this.url + '/' + path,
                 params: params,
                 data: data,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status == 200 || status == 400 // The only two response types that lawn normally returns data with
             });
             return response.data;
         }

@@ -22,7 +22,7 @@ export class WebClient {
         url: this.url + '/' + path,
         params: params,
         data: data,
-        validateStatus: (status: number) => status < 500
+        validateStatus: (status: number) => status == 200 || status == 400 // The only two response types that lawn normally returns data with
       })
       return response.data
     } catch (error) {
