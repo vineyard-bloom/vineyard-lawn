@@ -26,15 +26,9 @@ export interface Body {
   errors?: any[]
 }
 
-export class HTTPError extends HttpError {
-  constructor(message: string = 'Server Error', status: number = 500, body = {}) {
-    super(message, status, body)
-  }
-}
-
 export type BodyOrString = Body | string
 
-export class BadRequest extends HTTPError {
+export class BadRequest extends HttpError {
   constructor(message: string = 'Bad Request', bodyOrKey: BodyOrString = { key: '' }) {
     if (typeof bodyOrKey === 'string') {
       super(message, 400)
@@ -46,17 +40,24 @@ export class BadRequest extends HTTPError {
   }
 }
 
-export class NeedsLogin extends HTTPError {
+export class NeedsLogin extends HttpError {
 
-  constructor(message: string = 'This request requires a logged in user.') {
+  constructor(message: string = 'This request requires a logged in user') {
     super(message, 401)
   }
 }
 
-export class Unauthorized extends HTTPError {
+export class Unauthorized extends HttpError {
 
-  constructor(message: string = 'You are not authorized to perform this request.') {
+  constructor(message: string = 'You are not authorized to perform this request') {
     super(message, 403)
+  }
+}
+
+export class NotFound extends HttpError {
+
+  constructor(message: string = 'Resource not found') {
+    super(message, 404)
   }
 }
 

@@ -34,17 +34,23 @@ class BadRequest extends HTTPError {
 }
 exports.BadRequest = BadRequest;
 class NeedsLogin extends HTTPError {
-    constructor(message = 'This request requires a logged in user.') {
+    constructor(message = 'This request requires a logged in user') {
         super(message, 401);
     }
 }
 exports.NeedsLogin = NeedsLogin;
 class Unauthorized extends HTTPError {
-    constructor(message = 'You are not authorized to perform this request.') {
+    constructor(message = 'You are not authorized to perform this request') {
         super(message, 403);
     }
 }
 exports.Unauthorized = Unauthorized;
+class NotFound extends HTTPError {
+    constructor(message = 'Resource not found') {
+        super(message, 404);
+    }
+}
+exports.NotFound = NotFound;
 function sendErrorResponse(res, error) {
     const message = error.message = error.status == 500 ? 'Server Error' : error.message;
     const body = {
