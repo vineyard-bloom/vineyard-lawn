@@ -12,20 +12,17 @@ export interface Body {
     data?: any;
     errors?: any[];
 }
-export declare class HTTPError extends HttpError {
-    constructor(message?: string, status?: number, body?: {});
-}
 export declare type BodyOrString = Body | string;
-export declare class BadRequest extends HTTPError {
+export declare class BadRequest extends HttpError {
     constructor(message?: string, bodyOrKey?: BodyOrString);
 }
-export declare class NeedsLogin extends HTTPError {
+export declare class NeedsLogin extends HttpError {
     constructor(message?: string);
 }
-export declare class Unauthorized extends HTTPError {
+export declare class Unauthorized extends HttpError {
     constructor(message?: string);
 }
-export declare class NotFound extends HTTPError {
+export declare class NotFound extends HttpError {
     constructor(message?: string);
 }
 export declare function sendErrorResponse(res: any, error: HttpError): void;

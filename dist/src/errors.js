@@ -14,13 +14,7 @@ class HttpError extends Error {
     }
 }
 exports.HttpError = HttpError;
-class HTTPError extends HttpError {
-    constructor(message = 'Server Error', status = 500, body = {}) {
-        super(message, status, body);
-    }
-}
-exports.HTTPError = HTTPError;
-class BadRequest extends HTTPError {
+class BadRequest extends HttpError {
     constructor(message = 'Bad Request', bodyOrKey = { key: '' }) {
         if (typeof bodyOrKey === 'string') {
             super(message, 400);
@@ -33,19 +27,19 @@ class BadRequest extends HTTPError {
     }
 }
 exports.BadRequest = BadRequest;
-class NeedsLogin extends HTTPError {
+class NeedsLogin extends HttpError {
     constructor(message = 'This request requires a logged in user') {
         super(message, 401);
     }
 }
 exports.NeedsLogin = NeedsLogin;
-class Unauthorized extends HTTPError {
+class Unauthorized extends HttpError {
     constructor(message = 'You are not authorized to perform this request') {
         super(message, 403);
     }
 }
 exports.Unauthorized = Unauthorized;
-class NotFound extends HTTPError {
+class NotFound extends HttpError {
     constructor(message = 'Resource not found') {
         super(message, 404);
     }
@@ -55,7 +49,7 @@ function sendErrorResponse(res, error) {
     const message = error.message = error.status == 500 ? 'Server Error' : error.message;
     const body = {
         message: message,
-        key: error.key || error.body.key
+        key: error.key || (error.body ? error.body.key : undefined)
     };
     res.status(error.status).json(body);
 }

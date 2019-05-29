@@ -1,6 +1,6 @@
 // Lawn will handle any type of thrown errors, but also provides these helper Error types.
 
-import { LawnRequest, RequestListener } from './types'
+import {LawnRequest, RequestListener} from './types'
 
 export class HttpError extends Error {
   status: number
@@ -29,7 +29,7 @@ export interface Body {
 export type BodyOrString = Body | string
 
 export class BadRequest extends HttpError {
-  constructor(message: string = 'Bad Request', bodyOrKey: BodyOrString = { key: '' }) {
+  constructor(message: string = 'Bad Request', bodyOrKey: BodyOrString = {key: ''}) {
     if (typeof bodyOrKey === 'string') {
       super(message, 400)
       this.key = bodyOrKey
@@ -65,7 +65,7 @@ export function sendErrorResponse(res: any, error: HttpError) {
   const message = error.message = error.status == 500 ? 'Server Error' : error.message
   const body: any = {
     message: message,
-    key: error.key || error.body.key
+    key: error.key || (error.body ? error.body.key : undefined)
   }
 
   res.status(error.status).json(body)
