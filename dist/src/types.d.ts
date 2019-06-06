@@ -27,17 +27,18 @@ export interface RequestListener {
     onRequest(request: LawnRequest<any>, response: SimpleResponse, req: any): PromiseOrVoid;
     onError(error: Error, request?: LawnRequest<any>): PromiseOrVoid;
 }
-export interface Endpoint {
+export declare type Type<T> = new (...args: any[]) => T;
+export interface Endpoint<T = any> {
     /** HTTP Method */
     method: Method;
     /** Relative endpoint path */
     path: string;
     /** Request handler function */
-    handler: LawnHandler<any>;
+    handler: LawnHandler<T>;
     /** Array of Express middleware to use just for this endpoint */
     middleware?: any[];
     /** Optional callback that is fired when the endpoint sends a response */
     onResponse?: RequestListener;
     /** Optional placeholder for validation data.  Not directly used by Lawn but available for third-party request transforms. */
-    validation?: any;
+    validation?: Type<T>;
 }
