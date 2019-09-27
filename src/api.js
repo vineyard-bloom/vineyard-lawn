@@ -76,11 +76,18 @@ function createExpressHandler(endpoint) {
         }
         try {
             const content = await endpoint.handler(request);
-            res.json(content);
+            const isFunction = typeof content === 'function';
+            console.log('isFunction', isFunction);
+            if (isFunction) {
+                content(res);
+            }
+            else {
+                res.json(content);
+            }
             logRequest(request, onResponse, {
                 code: 200,
                 message: '',
-                body: content
+                body: isFunction ? '<CUSTOM>' : content
             }, req);
         }
         catch (error) {

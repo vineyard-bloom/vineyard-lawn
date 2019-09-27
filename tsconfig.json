@@ -5,8 +5,7 @@
     "strict": true,
     "sourceMap": true,
     "declaration": true,
-    "newLine": "lf",
-    "outDir": "dist-intermediate/dist"
+    "newLine": "lf"
   },
   "include": [
     "./src/lab/**/*",

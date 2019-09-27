@@ -5,6 +5,7 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./api"));
 __export(require("./errors"));
+__export(require("./lab"));
 __export(require("./server"));
 __export(require("./types"));
 __export(require("./versioning"));

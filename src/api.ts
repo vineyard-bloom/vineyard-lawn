@@ -100,16 +100,16 @@ export function createExpressHandler(endpoint: Endpoint): express.RequestHandler
 
     try {
       const content = await endpoint.handler(request)
-      const isStream = content instanceof stream.Readable
-      if (isStream) {
-        content.pipe(res)
+      const isFunction = typeof content === 'function'
+      if (isFunction) {
+        content(res)
       } else {
         res.json(content)
       }
       logRequest(request, onResponse, {
         code: 200,
         message: '',
-        body: isStream ? '<STREAM DATA>' : content
+        body: isFunction ? '<CUSTOM>' : content
       }, req)
     } catch (error) {
       handleError(res, error, onResponse, request)
