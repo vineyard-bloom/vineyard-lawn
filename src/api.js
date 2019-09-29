@@ -77,7 +77,6 @@ function createExpressHandler(endpoint) {
         try {
             const content = await endpoint.handler(request);
             const isFunction = typeof content === 'function';
-            console.log('isFunction', isFunction);
             if (isFunction) {
                 content(res);
             }
